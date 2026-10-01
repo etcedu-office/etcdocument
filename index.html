@@ -3,190 +3,255 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ระบบสารบรรณอิเล็กทรอนิกส์ | คณะศึกษาศาสตร์ มมส</title>
+<title>ระบบบันทึกข้อความอิเล็กทรอนิกส์ | ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- ไลบรารีแปลง HTML เป็น Word (.docx) -->
+<script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>body{font-family:'Sarabun',sans-serif}.fade{animation:f .25s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}</style>
+<style>body{font-family:'Sarabun',sans-serif}</style>
 </head>
 <body class="bg-slate-100 text-slate-800">
 
 <!-- หน้าเข้าสู่ระบบ -->
 <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 fade">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border">
     <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-purple-700 rounded-full mx-auto flex items-center justify-center text-white text-3xl">📄</div>
-      <h1 class="text-xl font-bold mt-3">ระบบสารบรรณอิเล็กทรอนิกส์</h1>
-      <p class="text-sm text-slate-500">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</p>
+      <div class="w-16 h-16 bg-purple-700 rounded-full mx-auto flex items-center justify-center text-white text-3xl">📝</div>
+      <h1 class="text-xl font-bold mt-3">ระบบบันทึกข้อความ (E-Memo)</h1>
+      <p class="text-xs text-slate-500 mt-1">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา<br>คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
     </div>
     <div class="space-y-3">
-      <input id="u" placeholder="ชื่อผู้ใช้" class="w-full border rounded-lg px-4 py-2.5 focus:ring-2 ring-purple-400 outline-none">
-      <input id="p" type="password" placeholder="รหัสผ่าน" class="w-full border rounded-lg px-4 py-2.5 focus:ring-2 ring-purple-400 outline-none">
-      <p id="loginErr" class="text-red-600 text-sm hidden"></p>
-      <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold">เข้าสู่ระบบ</button>
+      <div><label class="text-xs text-slate-600 font-semibold">ชื่อผู้ใช้</label><input id="u" placeholder="เช่น admin หรือ officer" class="w-full border rounded-lg px-4 py-2 mt-1 outline-none focus:ring-2 ring-purple-400 text-sm"></div>
+      <div><label class="text-xs text-slate-600 font-semibold">รหัสผ่าน</label><input id="p" type="password" placeholder="รหัสผ่าน" class="w-full border rounded-lg px-4 py-2 mt-1 outline-none focus:ring-2 ring-purple-400 text-sm"></div>
+      <p id="loginErr" class="text-red-600 text-xs hidden"></p>
+      <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold text-sm mt-2">เข้าสู่ระบบ</button>
     </div>
-    <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg">
-      <b>บัญชีทดลอง:</b> admin/admin123 · officer/1234 · head/1234 · teacher/1234
+    <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border">
+      <b>บัญชีทดลองตั้งต้น:</b><br>• แอดมิน: <code>admin</code> / <code>admin123</code><br>• เจ้าหน้าที่: <code>officer</code> / <code>1234</code><br><i>(รหัสผ่านสามารถแก้ไขที่ชีต Users ใน Google Sheet ได้ทันที)</i>
     </div>
   </div>
 </div>
 
-<!-- หน้าหลัก -->
+<!-- หน้าหลักระบบ -->
 <div id="app" class="hidden min-h-screen flex">
   <aside class="w-64 bg-purple-900 text-purple-100 flex flex-col">
-    <div class="p-5 border-b border-purple-700">
-      <div class="font-bold text-white">E-Document</div>
-      <div class="text-xs text-purple-300">ภาควิชาเทคโนโลยีฯ มมส</div>
+    <div class="p-5 border-b border-purple-800">
+      <div class="font-bold text-white">E-Memo EdTech MSU</div>
+      <div class="text-xs text-purple-300">ระบบสารบรรณบันทึกข้อความ</div>
     </div>
-    <nav id="menu" class="flex-1 p-3 space-y-1 text-sm"></nav>
-    <div class="p-4 border-t border-purple-700 text-sm">
+    <nav class="flex-1 p-3 space-y-1 text-sm">
+      <a href="#" class="block px-3 py-2 rounded-lg bg-purple-800 font-semibold text-white">📋 ทะเบียนบันทึกข้อความ</a>
+    </nav>
+    <div class="p-4 border-t border-purple-800 text-sm">
       <div id="meName" class="font-semibold text-white"></div>
       <div id="meRole" class="text-xs text-purple-300 mb-2"></div>
-      <button onclick="logout()" class="text-xs bg-purple-700 px-3 py-1.5 rounded w-full">ออกจากระบบ</button>
+      <button onclick="logout()" class="text-xs bg-purple-700 hover:bg-purple-600 text-white px-3 py-1.5 rounded w-full">ออกจากระบบ</button>
     </div>
   </aside>
-  <main id="content" class="flex-1 p-6 overflow-auto"></main>
+  <main id="content" class="flex-1 p-8 overflow-auto"></main>
 </div>
 
-<!-- Modal -->
+<!-- Modal ฟอร์มสร้าง/แก้ไขบันทึกข้อความ -->
 <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
-    <div class="flex justify-between items-center px-5 py-3 border-b">
-      <h3 id="mTitle" class="font-bold"></h3>
-      <button onclick="closeModal()" class="text-2xl leading-none">&times;</button>
+  <div class="bg-white rounded-xl w-full max-w-4xl max-h-[92vh] overflow-auto p-6 shadow-2xl">
+    <div class="flex justify-between items-center pb-3 border-b mb-4">
+      <h3 id="mTitle" class="font-bold text-lg text-purple-900"></h3>
+      <button onclick="closeModal()" class="text-2xl font-bold">&times;</button>
     </div>
-    <div id="mBody" class="p-5"></div>
+    <div id="mBody" class="space-y-4"></div>
   </div>
 </div>
 
 <script>
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycby-pjGLQkgO_dc4EW-WNivMfy6PgYqNEVmzTuOvgbs5mu4PStNJfdWlQIRhVIHGLAYv/exec', // วาง URL /exec จาก Google Apps Script ที่นี่
-  ORG: 'ภาควิชาเทคโนโลยีและสื่อสารการศึกษา คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม'
+  API_URL: 'วาง_URL_Web_App_จาก_Apps_Script_ที่นี่'
 };
-let ME = null, PAGE = 'dashboard';
+let ME = null, MEMOS = [];
 
 async function api(action, payload = {}) {
-  if (!CONFIG.API_URL) return { ok: false, error: 'กรุณาใส่ CONFIG.API_URL' };
   const r = await fetch(CONFIG.API_URL, {
     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(Object.assign({ action, user: ME ? ME.username : '' }, payload))
+    body: JSON.stringify(Object.assign({ action }, payload))
   });
   return await r.json();
 }
 
-const can = (perm) => ME && ME.permissions.includes(perm);
-
 async function doLogin(){
-  const r = await api('login', { username: u.value.trim(), password: p.value.trim() });
-  if (!r.ok){ loginErr.textContent = r.error; loginErr.classList.remove('hidden'); return; }
-  ME = r.data; sessionStorage.EDOC_ME = JSON.stringify(ME); startApp();
+  const res = await api('login', { username: u.value.trim(), password: p.value.trim() });
+  if(!res.ok){ loginErr.textContent = res.error; loginErr.classList.remove('hidden'); return; }
+  ME = res.data; startApp();
 }
-function logout(){ sessionStorage.removeItem('EDOC_ME'); location.reload(); }
+function logout(){ location.reload(); }
 
 function startApp(){
   loginPage.classList.add('hidden'); app.classList.remove('hidden');
-  meName.textContent = ME.fullName; meRole.textContent = ME.roleName + ' · ' + ME.position;
-  buildMenu(); go('dashboard');
+  meName.textContent = ME.fullName; meRole.textContent = ME.position;
+  loadMemos();
 }
 
-function buildMenu(){
-  const items = [
-    ['dashboard', '🏠 หน้าหลัก', null],
-    ['docin', '📥 ทะเบียนหนังสือรับ', 'doc.view'],
-    ['docout', '📤 ทะเบียนหนังสือส่ง', 'doc.view'],
-    ['search', '🔍 ค้นหาหนังสือ', 'doc.view'],
-    ['report', '📑 รายงานประจำเดือน (Docs)', 'doc.view'],
-    ['users', '👥 จัดการผู้ใช้', 'user.manage']
-  ].filter(i => !i[2] || can(i[2]));
-  menu.innerHTML = items.map(i => `<a href="#" onclick="go('${i[0]}');return false"
-    class="block px-3 py-2 rounded-lg hover:bg-purple-700 ${PAGE===i[0]?'bg-purple-700 text-white font-semibold':''}">${i[1]}</a>`).join('');
-}
-
-function go(pg){ PAGE = pg; buildMenu(); ({dashboard:pgDashboard, docin:()=>pgDocs('DocsIn'), docout:()=>pgDocs('DocsOut'), search:pgSearch, report:pgReport, users:pgUsers}[pg])(); }
-
-const H = (t,s='') => `<div class="mb-5"><h2 class="text-2xl font-bold">${t}</h2><p class="text-sm text-slate-500">${s}</p></div>`;
-
-async function pgDashboard(){
-  content.innerHTML = H('ภาพรวมระบบ', CONFIG.ORG) + `<div class="bg-white rounded-xl shadow-sm p-6">ยินดีต้อนรับเข้าสู่ระบบสารบรรณอิเล็กทรอนิกส์ เลือกเมนูด้านซ้ายเพื่อเริ่มต้นใช้งาน</div>`;
-}
-
-let DOCS=[], SHEET='DocsIn';
-async function pgDocs(sheet){
-  SHEET = sheet; const isIn = sheet==='DocsIn';
-  DOCS = (await api('list', {sheet})).data;
-  content.innerHTML = H(isIn?'ทะเบียนหนังสือรับ':'ทะเบียนหนังสือส่ง','ระบบจัดการหนังสือราชการอิเล็กทรอนิกส์') + `
-  <div class="flex gap-2 mb-4">
-    <input id="q" oninput="drawDocs()" placeholder="ค้นหา..." class="flex-1 border rounded-lg px-4 py-2">
-  </div>
-  <div class="bg-white rounded-xl shadow-sm overflow-auto"><table class="w-full text-sm">
-    <thead class="bg-slate-50 text-left"><tr><th class="p-3">เลขทะเบียน</th><th>เลขที่</th><th>ลงวันที่</th><th>${isIn?'จาก':'ถึง'}</th><th>เรื่อง</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
-    <tbody id="tb"></tbody></table></div>`;
-  drawDocs();
-}
-
-function drawDocs(){
-  const kw = (document.getElementById('q').value||'').toLowerCase();
-  const rows = DOCS.filter(d => JSON.stringify(d).toLowerCase().includes(kw));
-  document.getElementById('tb').innerHTML = rows.length ? rows.map(d => `<tr class="border-t">
-    <td class="p-3 font-semibold">${d.RegNo}</td><td>${d.DocNo}</td><td>${d.DocDate}</td>
-    <td>${SHEET==='DocsIn'?d.Sender:d.Receiver}</td><td>${d.Subject}</td><td>${d.Status}</td>
-    <td class="p-3 whitespace-nowrap">
-      <button onclick='printOfficial("${d.DocID}")' class="text-purple-600 text-xs mr-2 font-semibold">พิมพ์ PDF</button>
-      ${SHEET==='DocsIn' && can('doc.approve') ? `<button onclick='openWorkflowModal("${d.DocID}")' class="text-sky-600 text-xs mr-2 font-semibold">เกษียน</button>` : ''}
-    </td></tr>`).join('') : `<tr><td colspan="7" class="p-6 text-center text-slate-400">ไม่พบข้อมูล</td></tr>`;
-}
-
-async function printOfficial(id){
-  const r = await api('printDoc', { sheet: SHEET, docId: id });
-  if(r.ok) window.open(r.data.pdfUrl, '_blank'); else alert(r.error);
-}
-
-async function openWorkflowModal(docId){
-  const d = DOCS.find(x => x.DocID === docId);
-  const history = (await api('workflowHistory', {docId})).data;
-  openModal('เกษียนหนังสือ / สั่งการ (E-Approval)', `
-    <div class="space-y-4 text-sm">
-      <div class="bg-slate-50 p-3 rounded-lg border"><b>${d.Subject}</b><div class="text-xs text-slate-500">เลขรับ: ${d.RegNo}</div></div>
-      <div><h4 class="font-semibold mb-2">ประวัติการเกษียน (${history.length})</h4>
-      <div class="space-y-2 max-h-32 overflow-auto border p-2 rounded">${history.map(h=>`<div><b>${h.FromUser}</b> ➔ ${h.ToUser} [${h.Action}]: ${h.Comment}</div>`).join('')||'ยังไม่มี'}</div></div>
-      <div class="border-t pt-3 space-y-2">
-        <select id="wfAction" class="w-full border rounded p-2"><option>ทราบ / ดำเนินการ</option><option>เห็นชอบ / อนุมัติ</option></select>
-        <textarea id="wfComment" rows="2" class="w-full border rounded p-2" placeholder="ความเห็นสั่งการ..."></textarea>
+async function loadMemos(){
+  const res = await api('list', { sheet: 'Memos' });
+  MEMOS = res.ok ? res.data : [];
+  
+  content.innerHTML = `
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-800">ทะเบียนบันทึกข้อความราชการ</h2>
+        <p class="text-sm text-slate-500">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
       </div>
-      <div class="flex justify-between"><button onclick="downloadSlip('${docId}')" class="text-xs text-blue-600 underline">📥 ดาวน์โหลดใบปะหน้า</button>
-      <button onclick="submitWorkflow('${docId}')" class="px-4 py-2 bg-sky-600 text-white rounded">บันทึก</button></div>
-    </div>`);
+      <button onclick="openForm()" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-lg font-semibold text-sm shadow">+ สร้างบันทึกข้อความใหม่</button>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-slate-50 border-b text-slate-600">
+          <tr>
+            <th class="p-3">ที่หนังสือ</th>
+            <th class="p-3">วันที่</th>
+            <th class="p-3">เรื่อง</th>
+            <th class="p-3">ผู้รับ (ถึง)</th>
+            <th class="p-3 text-right">จัดการ / ส่งออก</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${MEMOS.length ? MEMOS.map(m => `
+            <tr class="border-b hover:bg-slate-50">
+              <td class="p-3 font-semibold">${m.DocNo}</td>
+              <td class="p-3">${m.DocDate}</td>
+              <td class="p-3 font-medium text-purple-900">${m.Subject}</td>
+              <td class="p-3">${m.ToDept}</td>
+              <td class="p-3 text-right space-x-2">
+                <button onclick="exportWord('${m.MemoID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">📥 โหลด Word</button>
+                <button onclick="openForm('${m.MemoID}')" class="text-amber-600 hover:underline text-xs font-semibold">แก้ไข</button>
+                <button onclick="delMemo('${m.MemoID}')" class="text-red-600 hover:underline text-xs font-semibold">ลบ</button>
+              </td>
+            </tr>`).join('') : `<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการสร้างบันทึกข้อความในระบบ</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
 }
 
-async function submitWorkflow(docId){
-  const r = await api('saveWorkflow', { docId, action: wfAction.value, comment: wfComment.value, user: ME.username, userFullName: ME.fullName });
-  if(r.ok){ alert('บันทึกสำเร็จ'); closeModal(); pgDocs('DocsIn'); } else alert(r.error);
-}
-async function downloadSlip(docId){
-  const r = await api('approvalSlip', {docId});
-  if(r.ok) window.open(r.data.pdfUrl, '_blank');
+function openForm(id){
+  const m = id ? MEMOS.find(x => x.MemoID === id) : {
+    MemoID: '',
+    DocNo: 'อว 0605.6/',
+    DocDate: new Date().toISOString().slice(0,10),
+    FromDept: 'ภาควิชาเทคโนโลยีและสื่อสารการศึกษา โทร. ๐ ๔๓๗๕ ๔๓๒๑',
+    ToDept: 'คณบดีคณะศึกษาศาสตร์',
+    Subject: '',
+    Content: '',
+    SenderName: ME.fullName,
+    SenderPos: ME.position
+  };
+  
+  mTitle.textContent = id ? 'แก้ไขบันทึกข้อความ' : 'สร้างบันทึกข้อความราชการใหม่';
+  mBody.innerHTML = `
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div><label class="font-semibold text-slate-600">ที่หนังสือ</label><input id="f_DocNo" value="${m.DocNo}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      <div><label class="font-semibold text-slate-600">วันที่</label><input id="f_DocDate" type="date" value="${m.DocDate}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      
+      <div class="col-span-2"><label class="font-semibold text-slate-600">ส่วนราชการ (จาก)</label><input id="f_FromDept" value="${m.FromDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      <div class="col-span-2"><label class="font-semibold text-slate-600">เรียน (ถึง)</label><input id="f_ToDept" value="${m.ToDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      <div class="col-span-2"><label class="font-semibold text-slate-600">เรื่อง</label><input id="f_Subject" value="${m.Subject}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      
+      <div class="col-span-2">
+        <label class="font-semibold text-slate-600">เนื้อหาบันทึกข้อความ (ย่อหน้าแรกจะถูกเว้นระยะกั้นหน้าตามระเบียบ)</label>
+        <textarea id="f_Content" rows="6" class="w-full border rounded px-3 py-2 mt-1 leading-relaxed" placeholder="พิมพ์รายละเอียดเนื้อหาที่นี่...">${m.Content}</textarea>
+      </div>
+
+      <div><label class="font-semibold text-slate-600">ชื่อผู้ลงนาม</label><input id="f_SenderName" value="${m.SenderName}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      <div><label class="font-semibold text-slate-600">ตำแหน่งผู้ลงนาม</label><input id="f_SenderPos" value="${m.SenderPos}" class="w-full border rounded px-3 py-2 mt-1"></div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2 pt-3 border-t">
+      <button onclick="closeModal()" class="px-4 py-2 border rounded text-sm">ยกเลิก</button>
+      <button onclick="saveMemo('${id||''}')" class="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded font-semibold text-sm">บันทึกข้อมูลลง Sheet</button>
+    </div>`;
+  modal.classList.remove('hidden');
 }
 
-function pgReport(){
-  content.innerHTML = H('รายงานประจำเดือน (Docs Template)', 'สร้างรายงานตามรูปแบบระเบียบสารบรรณ') + `
-  <div class="bg-white rounded-xl shadow-sm p-6 max-w-xl space-y-4">
-    <div><label class="text-sm">ปี พ.ศ.</label><input id="rY" value="2568" class="w-full border rounded p-2 mt-1"></div>
-    <button onclick="makeReport()" class="bg-purple-700 text-white px-5 py-2.5 rounded font-semibold">สร้างรายงาน PDF</button>
-    <div id="rOut"></div>
-  </div>`;
-}
-async function makeReport(){
-  rOut.innerHTML = 'กำลังสร้างเอกสาร...';
-  const r = await api('reportDocs', { year: rY.value });
-  rOut.innerHTML = r.ok ? `<a href="${r.data.pdfUrl}" target="_blank" class="text-blue-600 underline">📄 เปิดไฟล์รายงาน PDF</a>` : r.error;
+async function saveMemo(id){
+  const rec = {
+    MemoID: id,
+    DocNo: document.getElementById('f_DocNo').value,
+    DocDate: document.getElementById('f_DocDate').value,
+    FromDept: document.getElementById('f_FromDept').value,
+    ToDept: document.getElementById('f_ToDept').value,
+    Subject: document.getElementById('f_Subject').value,
+    Content: document.getElementById('f_Content').value,
+    SenderName: document.getElementById('f_SenderName').value,
+    SenderPos: document.getElementById('f_SenderPos').value,
+    CreatedBy: ME.username
+  };
+  await api('save', { sheet: 'Memos', record: rec });
+  closeModal(); loadMemos();
 }
 
-function pgSearch(){ content.innerHTML = H('ค้นหาหนังสือ'); }
-function pgUsers(){ content.innerHTML = H('จัดการผู้ใช้งาน'); }
-function openModal(t,b){ mTitle.textContent=t; mBody.innerHTML=b; modal.classList.remove('hidden'); }
+async function delMemo(id){
+  if(!confirm('ยืนยันการลบบันทึกข้อความฉบับนี้?')) return;
+  await api('delete', { sheet: 'Memos', id });
+  loadMemos();
+}
+
+// ฟังก์ชันแปลงฟอร์มให้ถูกต้องตามรูปแบบหนังสือราชการไทย และดาวน์โหลดเป็นไฟล์ .docx
+function exportWord(id){
+  const m = MEMOS.find(x => x.MemoID === id);
+  if(!m) return;
+
+  const htmlContent = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>${m.Subject}</title>
+    <style>
+      body { font-family: 'TH Sarabun PSK', 'Sarabun', sans-serif; font-size: 16pt; line-height: 1.0; margin: 2.5cm; }
+      .memo-title { text-align: center; font-size: 29pt; font-weight: bold; margin-bottom: 20px; }
+      .header-table { width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 10px; }
+      .header-table td { padding: 4px 0; vertical-align: top; }
+      .content { text-indent: 2.5cm; text-align: justify; margin-top: 15px; line-height: 1.2; }
+      .signature { text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; }
+    </style>
+    </head>
+    <body>
+      <div class="memo-title">บันทึกข้อความ</div>
+      
+      <table class="header-table">
+        <tr>
+          <td style="width: 70%;"><b>ส่วนราชการ:</b> ${m.FromDept}</td>
+          <td style="width: 30%;"></td>
+        </tr>
+        <tr>
+          <td><b>ที่:</b> ${m.DocNo}</td>
+          <td><b>วันที่:</b> ${m.DocDate}</td>
+        </tr>
+        <tr>
+          <td colspan="2"><b>เรื่อง:</b> ${m.Subject}</td>
+        </tr>
+      </table>
+      
+      <hr style="border: none; border-top: 1.5px solid #000; margin: 5px 0 15px 0;" />
+      
+      <p><b>เรียน:</b> ${m.ToDept}</p>
+      
+      <div class="content">
+        ${m.Content.replace(/\n/g, '<br/><span style="display:inline-block; width:2.5cm;"></span>')}
+      </div>
+      
+      <div class="signature">
+        <p>( ${m.SenderName} )</p>
+        <p>${m.SenderPos}</p>
+      </div>
+    </body>
+    </html>`;
+
+  const converted = htmlDocx.asBlob(htmlContent);
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(converted);
+  link.download = `บันทึกข้อความ_${m.DocNo.replace(/\//g, '-')}.docx`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 function closeModal(){ modal.classList.add('hidden'); }
-
-if(sessionStorage.EDOC_ME){ ME=JSON.parse(sessionStorage.EDOC_ME); startApp(); }
 </script>
 </body>
 </html>
