@@ -27,7 +27,7 @@
       <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold text-sm mt-2">เข้าสู่ระบบ</button>
     </div>
     <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border">
-      <b>บัญชีทดลองตั้งต้น:</b><br>• แอดมิน: <code>admin</code> / <code>admin123</code><br>• เจ้าหน้าที่: <code>officer</code> / <code>1234</code><br><i>(รหัสผ่านสามารถแก้ไขที่ชีต Users ใน Google Sheet ได้ทันที)</i>
+      <b>บัญชีทดลองตั้งต้น:</b><br>• แอดมิน: <code>admin</code> / <code>admin123</code><br>• เจ้าหน้าที่: <code>officer</code> / <code>1234</code><br><i>(รหัสผ่านแก้ไขที่ชีต Users ใน Google Sheet ได้ทันที)</i>
     </div>
   </div>
 </div>
@@ -155,7 +155,7 @@ function openForm(id){
       <div class="col-span-2"><label class="font-semibold text-slate-600">เรื่อง</label><input id="f_Subject" value="${m.Subject}" class="w-full border rounded px-3 py-2 mt-1"></div>
       
       <div class="col-span-2">
-        <label class="font-semibold text-slate-600">เนื้อหาบันทึกข้อความ (ย่อหน้าแรกจะถูกเว้นระยะกั้นหน้าตามระเบียบ)</label>
+        <label class="font-semibold text-slate-600">เนื้อหาบันทึกข้อความ (ระบบจะจัดย่อหน้า 2.5 ซม. อัตโนมัติ)</label>
         <textarea id="f_Content" rows="6" class="w-full border rounded px-3 py-2 mt-1 leading-relaxed" placeholder="พิมพ์รายละเอียดเนื้อหาที่นี่...">${m.Content}</textarea>
       </div>
 
@@ -193,48 +193,70 @@ async function delMemo(id){
   loadMemos();
 }
 
-// ฟังก์ชันแปลงฟอร์มให้ถูกต้องตามรูปแบบหนังสือราชการไทย และดาวน์โหลดเป็นไฟล์ .docx
+// ฟังก์ชันแปลงเอกสารพร้อมตราครุฑและจัดรูปแบบตามระเบียบงานสารบรรณ ส่งออกเป็นไฟล์ .docx
 function exportWord(id){
   const m = MEMOS.find(x => x.MemoID === id);
   if(!m) return;
+
+  // URL ตราครุฑมาตรฐาน (PNG พื้นหลังโปร่งใส สำหรับใช้ในเอกสารราชการ)
+  const garudaUrl = "https://upload.wikimedia.org/wikipedia/commons/f/fa/Emblem_of_Thailand.svg";
 
   const htmlContent = `
     <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head><meta charset='utf-8'><title>${m.Subject}</title>
     <style>
-      body { font-family: 'TH Sarabun PSK', 'Sarabun', sans-serif; font-size: 16pt; line-height: 1.0; margin: 2.5cm; }
-      .memo-title { text-align: center; font-size: 29pt; font-weight: bold; margin-bottom: 20px; }
-      .header-table { width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 10px; }
-      .header-table td { padding: 4px 0; vertical-align: top; }
-      .content { text-indent: 2.5cm; text-align: justify; margin-top: 15px; line-height: 1.2; }
-      .signature { text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; }
+      body { font-family: 'TH Sarabun PSK', 'Sarabun', sans-serif; font-size: 16pt; line-height: 1.0; margin-top: 2.5cm; margin-bottom: 2.5cm; margin-left: 3cm; margin-right: 2.5cm; }
+      .garuda-container { text-align: center; margin-bottom: 5px; }
+      .garuda-img { width: 2.5cm; height: auto; }
+      .memo-title { text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px; }
+      .header-table { width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px; }
+      .header-table td { padding: 3px 0; vertical-align: top; }
+      .divider { border: none; border-top: 1.5px solid #000; margin: 2px 0 10px 0; }
+      .to-section { font-size: 16pt; margin-bottom: 15px; }
+      .content { text-indent: 2.5cm; text-align: justify; margin-bottom: 20px; line-height: 1.2; }
+      .signature { text-align: center; margin-top: 30px; margin-left: 50%; line-height: 1.2; font-size: 16pt; }
     </style>
     </head>
     <body>
+      <!-- ตราครุฑ -->
+      <div class="garuda-container">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" class="garuda-img" alt="ตราครุฑ" />
+      </div>
+
+      <!-- หัวข้อบันทึกข้อความ -->
       <div class="memo-title">บันทึกข้อความ</div>
       
+      <!-- ตารางส่วนราชการ ที่ วันที่ เรื่อง -->
       <table class="header-table">
         <tr>
-          <td style="width: 70%;"><b>ส่วนราชการ:</b> ${m.FromDept}</td>
-          <td style="width: 30%;"></td>
+          <td style="width: 100%;"><b>ส่วนราชการ:</b> ${m.FromDept}</td>
         </tr>
         <tr>
-          <td><b>ที่:</b> ${m.DocNo}</td>
-          <td><b>วันที่:</b> ${m.DocDate}</td>
+          <td>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="width: 60%;"><b>ที่:</b> ${m.DocNo}</td>
+                <td style="width: 40%;"><b>วันที่:</b> ${m.DocDate}</td>
+              </tr>
+            </table>
+          </td>
         </tr>
         <tr>
-          <td colspan="2"><b>เรื่อง:</b> ${m.Subject}</td>
+          <td><b>เรื่อง:</b> ${m.Subject}</td>
         </tr>
       </table>
       
-      <hr style="border: none; border-top: 1.5px solid #000; margin: 5px 0 15px 0;" />
+      <hr class="divider" />
       
-      <p><b>เรียน:</b> ${m.ToDept}</p>
+      <!-- เรียน -->
+      <div class="to-section"><b>เรียน:</b> ${m.ToDept}</div>
       
+      <!-- เนื้อหา -->
       <div class="content">
         ${m.Content.replace(/\n/g, '<br/><span style="display:inline-block; width:2.5cm;"></span>')}
       </div>
       
+      <!-- ลงชื่อ -->
       <div class="signature">
         <p>( ${m.SenderName} )</p>
         <p>${m.SenderPos}</p>
