@@ -3,24 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ระบบสารบรรณอิเล็กทรอนิกส์ | ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</title>
+<title>ระบบสารบรรณอิเล็กทรอนิกส์ | คณะศึกษาศาสตร์ มมส</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-  body{font-family:'Sarabun',sans-serif}
-  .fade{animation:f .25s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-</style>
+<style>body{font-family:'Sarabun',sans-serif}.fade{animation:f .25s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}</style>
 </head>
 <body class="bg-slate-100 text-slate-800">
 
-<!-- ================== หน้าเข้าสู่ระบบ ================== -->
+<!-- หน้าเข้าสู่ระบบ -->
 <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
   <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 fade">
     <div class="text-center mb-6">
       <div class="w-16 h-16 bg-purple-700 rounded-full mx-auto flex items-center justify-center text-white text-3xl">📄</div>
       <h1 class="text-xl font-bold mt-3">ระบบสารบรรณอิเล็กทรอนิกส์</h1>
-      <p class="text-sm text-slate-500">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา</p>
-      <p class="text-sm text-slate-500">คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
+      <p class="text-sm text-slate-500">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</p>
     </div>
     <div class="space-y-3">
       <input id="u" placeholder="ชื่อผู้ใช้" class="w-full border rounded-lg px-4 py-2.5 focus:ring-2 ring-purple-400 outline-none">
@@ -29,12 +25,12 @@
       <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold">เข้าสู่ระบบ</button>
     </div>
     <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg">
-      <b>บัญชีทดลอง:</b> admin/admin123 (ผู้ดูแล) · officer/1234 (สารบรรณ) · head/1234 (ผู้บริหาร) · teacher/1234 (บุคลากร)
+      <b>บัญชีทดลอง:</b> admin/admin123 · officer/1234 · head/1234 · teacher/1234
     </div>
   </div>
 </div>
 
-<!-- ================== หน้าหลัก ================== -->
+<!-- หน้าหลัก -->
 <div id="app" class="hidden min-h-screen flex">
   <aside class="w-64 bg-purple-900 text-purple-100 flex flex-col">
     <div class="p-5 border-b border-purple-700">
@@ -51,7 +47,7 @@
   <main id="content" class="flex-1 p-6 overflow-auto"></main>
 </div>
 
-<!-- ================== Modal ================== -->
+<!-- Modal -->
 <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
     <div class="flex justify-between items-center px-5 py-3 border-b">
@@ -63,92 +59,26 @@
 </div>
 
 <script>
-/* ============ ตั้งค่า ============ */
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycby-pjGLQkgO_dc4EW-WNivMfy6PgYqNEVmzTuOvgbs5mu4PStNJfdWlQIRhVIHGLAYv/exec',          // ใส่ URL /exec ของ Apps Script  (ว่าง = โหมดสาธิตด้วย localStorage)
+  API_URL: '', // วาง URL /exec จาก Google Apps Script ที่นี่
   ORG: 'ภาควิชาเทคโนโลยีและสื่อสารการศึกษา คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม'
-};
-const PERM_LIST = {
-  'doc.view':'ดูหนังสือ','doc.create':'ลงทะเบียนหนังสือ','doc.edit':'แก้ไขหนังสือ',
-  'doc.delete':'ลบหนังสือ','doc.approve':'เกษียน/อนุมัติ','user.manage':'จัดการผู้ใช้',
-  'role.manage':'กำหนดสิทธิ์','setting.manage':'ตั้งค่าระบบ','log.view':'ดูประวัติการใช้งาน'
 };
 let ME = null, PAGE = 'dashboard';
 
-/* ============ ชั้นเชื่อมต่อข้อมูล ============ */
 async function api(action, payload = {}) {
-  if (!CONFIG.API_URL) return demoApi(action, payload);           // โหมดสาธิต
+  if (!CONFIG.API_URL) return { ok: false, error: 'กรุณาใส่ CONFIG.API_URL' };
   const r = await fetch(CONFIG.API_URL, {
-    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify(Object.assign({action, user: ME?ME.username:''}, payload))
+    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ action, user: ME ? ME.username : '' }, payload))
   });
   return await r.json();
 }
 
-/* ---- โหมดสาธิต: เก็บใน localStorage เพื่อให้ทดลองบน GitHub Pages ได้ทันที ---- */
-const SEED = {
-  Users:[
-    {UserID:'U001',Username:'admin',Password:'admin123',FullName:'ผศ.ดร.สมชาย ใจดี',Position:'หัวหน้าภาควิชา',Role:'ADMIN',Status:'ACTIVE',Email:'admin@msu.ac.th'},
-    {UserID:'U002',Username:'officer',Password:'1234',FullName:'นางสาวสุดา รักงาน',Position:'เจ้าหน้าที่บริหารงานทั่วไป',Role:'OFFICER',Status:'ACTIVE',Email:'officer@msu.ac.th'},
-    {UserID:'U003',Username:'head',Password:'1234',FullName:'รศ.ดร.วิชัย พัฒนา',Position:'ประธานหลักสูตร',Role:'HEAD',Status:'ACTIVE',Email:'head@msu.ac.th'},
-    {UserID:'U004',Username:'teacher',Password:'1234',FullName:'อ.ดร.มานี ตั้งใจ',Position:'อาจารย์',Role:'STAFF',Status:'ACTIVE',Email:'teacher@msu.ac.th'}],
-  Roles:[
-    {Role:'ADMIN',RoleName:'ผู้ดูแลระบบ',Permissions:'doc.view,doc.create,doc.edit,doc.delete,doc.approve,user.manage,role.manage,setting.manage,log.view'},
-    {Role:'OFFICER',RoleName:'เจ้าหน้าที่สารบรรณ',Permissions:'doc.view,doc.create,doc.edit,doc.delete,log.view'},
-    {Role:'HEAD',RoleName:'ผู้บริหาร/หัวหน้าภาค',Permissions:'doc.view,doc.approve,log.view'},
-    {Role:'STAFF',RoleName:'อาจารย์/บุคลากร',Permissions:'doc.view'}],
-  DocsIn:[
-    {DocID:'DI001',RegNo:'0001/2568',DocNo:'อว 0605/1024',DocDate:'2568-01-08',ReceiveDate:'2568-01-09',Sender:'คณะศึกษาศาสตร์',Subject:'ขอเชิญประชุมคณะกรรมการประจำคณะ ครั้งที่ 1/2568',DocType:'หนังสือภายใน',Urgency:'ด่วน',Secrecy:'ปกติ',FileURL:'',AssignTo:'ผศ.ดร.สมชาย ใจดี',Status:'ดำเนินการแล้ว',Note:'เข้าร่วมประชุม 15 ม.ค.',CreatedBy:'officer',CreatedAt:'2568-01-09'},
-    {DocID:'DI002',RegNo:'0002/2568',DocNo:'อว 0605.1/205',DocDate:'2568-01-12',ReceiveDate:'2568-01-13',Sender:'กองทะเบียนและประมวลผล',Subject:'แจ้งกำหนดการส่งผลการเรียน ภาคเรียนที่ 2/2567',DocType:'หนังสือภายใน',Urgency:'ปกติ',Secrecy:'ปกติ',FileURL:'',AssignTo:'อาจารย์ทุกท่าน',Status:'รอดำเนินการ',Note:'',CreatedBy:'officer',CreatedAt:'2568-01-13'},
-    {DocID:'DI003',RegNo:'0003/2568',DocNo:'ศธ 04002/88',DocDate:'2568-01-15',ReceiveDate:'2568-01-16',Sender:'สพป.มหาสารคาม เขต 1',Subject:'ขอความอนุเคราะห์วิทยากรอบรมสื่อดิจิทัลเพื่อการเรียนรู้',DocType:'หนังสือภายนอก',Urgency:'ด่วนมาก',Secrecy:'ปกติ',FileURL:'',AssignTo:'รศ.ดร.วิชัย พัฒนา',Status:'กำลังดำเนินการ',Note:'',CreatedBy:'officer',CreatedAt:'2568-01-16'}],
-  DocsOut:[
-    {DocID:'DO001',RegNo:'0001/2568',DocNo:'อว 0605.6/011',DocDate:'2568-01-10',SendDate:'2568-01-10',Receiver:'คณบดีคณะศึกษาศาสตร์',Subject:'รายงานผลการดำเนินงานโครงการพัฒนาสื่อการสอน ประจำปี 2567',DocType:'หนังสือภายใน',Urgency:'ปกติ',Secrecy:'ปกติ',FileURL:'',Status:'ส่งแล้ว',Note:'',CreatedBy:'officer',CreatedAt:'2568-01-10'},
-    {DocID:'DO002',RegNo:'0002/2568',DocNo:'อว 0605.6/014',DocDate:'2568-01-17',SendDate:'2568-01-18',Receiver:'ผู้อำนวยการ สพป.มหาสารคาม เขต 1',Subject:'ตอบรับการเป็นวิทยากรอบรมสื่อดิจิทัลเพื่อการเรียนรู้',DocType:'หนังสือภายนอก',Urgency:'ด่วน',Secrecy:'ปกติ',FileURL:'',Status:'รอลงนาม',Note:'',CreatedBy:'officer',CreatedAt:'2568-01-17'}],
-  Logs:[],
-  Settings:[{Key:'DOC_PREFIX',Value:'อว 0605.6/'},{Key:'CURRENT_YEAR',Value:'2568'}]
-};
-function db(name){ if(!localStorage['EDOC_'+name]) localStorage['EDOC_'+name]=JSON.stringify(SEED[name]||[]);
-  return JSON.parse(localStorage['EDOC_'+name]); }
-function dbSave(name,arr){ localStorage['EDOC_'+name]=JSON.stringify(arr); }
-
-function demoApi(action,p){
-  if(action==='login'){
-    const u = db('Users').find(x=>x.Username===p.username && x.Password===p.password);
-    if(!u) return {ok:false,error:'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'};
-    if(u.Status!=='ACTIVE') return {ok:false,error:'บัญชีนี้ถูกระงับการใช้งาน'};
-    const r = db('Roles').find(x=>x.Role===u.Role)||{Permissions:''};
-    const lg=db('Logs'); lg.unshift({Timestamp:new Date().toLocaleString('th-TH'),Username:u.Username,Action:'LOGIN',Detail:'เข้าสู่ระบบ'}); dbSave('Logs',lg);
-    return {ok:true,data:{userId:u.UserID,username:u.Username,fullName:u.FullName,position:u.Position,
-      role:u.Role,roleName:r.RoleName,permissions:r.Permissions.split(',').map(s=>s.trim()).filter(Boolean)}};
-  }
-  if(action==='list')   return {ok:true,data:db(p.sheet)};
-  if(action==='save'){
-    const a=db(p.sheet), key=Object.keys(a[0]||p.record)[0], i=a.findIndex(x=>x[key]===p.record[key]);
-    if(i>=0) a[i]=Object.assign(a[i],p.record);
-    else { if(!p.record[key]) p.record[key]=p.sheet.substring(0,2).toUpperCase()+Date.now(); a.push(p.record); }
-    dbSave(p.sheet,a); addLog(i>=0?'UPDATE':'CREATE',p.sheet+' : '+(p.record.Subject||p.record.FullName||p.record.RoleName||''));
-    return {ok:true,data:p.record};
-  }
-  if(action==='delete'){
-    const a=db(p.sheet), key=Object.keys(a[0])[0];
-    dbSave(p.sheet,a.filter(x=>x[key]!==p.id)); addLog('DELETE',p.sheet+' : '+p.id);
-    return {ok:true};
-  }
-  if(action==='nextRegNo'){
-    const y='2568', n=db(p.sheet).filter(d=>String(d.RegNo).includes('/'+y)).length+1;
-    return {ok:true,data:{regNo:String(n).padStart(4,'0')+'/'+y}};
-  }
-  return {ok:false,error:'unknown'};
-}
-function addLog(a,d){ const l=db('Logs'); l.unshift({Timestamp:new Date().toLocaleString('th-TH'),Username:ME?ME.username:'-',Action:a,Detail:d}); dbSave('Logs',l.slice(0,300)); }
-
-/* ============ สิทธิ์การใช้งาน ============ */
 const can = (perm) => ME && ME.permissions.includes(perm);
 
-/* ============ เข้าสู่ระบบ ============ */
 async function doLogin(){
-  const r = await api('login',{username:u.value.trim(),password:p.value.trim()});
-  if(!r.ok){ loginErr.textContent=r.error; loginErr.classList.remove('hidden'); return; }
+  const r = await api('login', { username: u.value.trim(), password: p.value.trim() });
+  if (!r.ok){ loginErr.textContent = r.error; loginErr.classList.remove('hidden'); return; }
   ME = r.data; sessionStorage.EDOC_ME = JSON.stringify(ME); startApp();
 }
 function logout(){ sessionStorage.removeItem('EDOC_ME'); location.reload(); }
@@ -161,229 +91,102 @@ function startApp(){
 
 function buildMenu(){
   const items = [
-    ['dashboard','🏠 หน้าหลัก',null],
-    ['docin','📥 ทะเบียนหนังสือรับ','doc.view'],
-    ['docout','📤 ทะเบียนหนังสือส่ง','doc.view'],
-    ['search','🔍 ค้นหาหนังสือ','doc.view'],
-    ['users','👥 จัดการผู้ใช้งาน','user.manage'],
-    ['roles','🔐 กำหนดสิทธิ์การใช้งาน','role.manage'],
-    ['logs','📊 ประวัติการใช้งาน','log.view']
+    ['dashboard', '🏠 หน้าหลัก', null],
+    ['docin', '📥 ทะเบียนหนังสือรับ', 'doc.view'],
+    ['docout', '📤 ทะเบียนหนังสือส่ง', 'doc.view'],
+    ['search', '🔍 ค้นหาหนังสือ', 'doc.view'],
+    ['report', '📑 รายงานประจำเดือน (Docs)', 'doc.view'],
+    ['users', '👥 จัดการผู้ใช้', 'user.manage']
   ].filter(i => !i[2] || can(i[2]));
-  menu.innerHTML = items.map(i=>`<a href="#" onclick="go('${i[0]}');return false"
+  menu.innerHTML = items.map(i => `<a href="#" onclick="go('${i[0]}');return false"
     class="block px-3 py-2 rounded-lg hover:bg-purple-700 ${PAGE===i[0]?'bg-purple-700 text-white font-semibold':''}">${i[1]}</a>`).join('');
 }
-function go(pg){ PAGE=pg; buildMenu(); ({dashboard:pgDashboard,docin:()=>pgDocs('DocsIn'),
-  docout:()=>pgDocs('DocsOut'),search:pgSearch,users:pgUsers,roles:pgRoles,logs:pgLogs}[pg])(); }
+
+function go(pg){ PAGE = pg; buildMenu(); ({dashboard:pgDashboard, docin:()=>pgDocs('DocsIn'), docout:()=>pgDocs('DocsOut'), search:pgSearch, report:pgReport, users:pgUsers}[pg])(); }
 
 const H = (t,s='') => `<div class="mb-5"><h2 class="text-2xl font-bold">${t}</h2><p class="text-sm text-slate-500">${s}</p></div>`;
-const card = (n,v,c) => `<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 ${c}">
-  <div class="text-sm text-slate-500">${n}</div><div class="text-3xl font-bold mt-1">${v}</div></div>`;
 
-/* ============ หน้าหลัก ============ */
 async function pgDashboard(){
-  const di=(await api('list',{sheet:'DocsIn'})).data, dout=(await api('list',{sheet:'DocsOut'})).data;
-  const wait = di.filter(d=>d.Status==='รอดำเนินการ').length;
-  const urgent = di.filter(d=>d.Urgency!=='ปกติ').length;
-  content.innerHTML = H('ภาพรวมระบบ', CONFIG.ORG) + `
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    ${card('หนังสือรับทั้งหมด',di.length,'border-blue-500')}
-    ${card('หนังสือส่งทั้งหมด',dout.length,'border-green-500')}
-    ${card('รอดำเนินการ',wait,'border-amber-500')}
-    ${card('ด่วน / ด่วนมาก',urgent,'border-red-500')}
-  </div>
-  <div class="bg-white rounded-xl shadow-sm p-5">
-    <h3 class="font-bold mb-3">หนังสือรับล่าสุด</h3>
-    <table class="w-full text-sm"><thead class="text-left text-slate-500 border-b">
-      <tr><th class="py-2">เลขรับ</th><th>เรื่อง</th><th>จาก</th><th>สถานะ</th></tr></thead>
-      <tbody>${di.slice(-5).reverse().map(d=>`<tr class="border-b last:border-0">
-        <td class="py-2">${d.RegNo}</td><td>${d.Subject}</td><td>${d.Sender}</td>
-        <td>${badge(d.Status)}</td></tr>`).join('')}</tbody></table>
-  </div>`;
-}
-function badge(s){
-  const c = {'รอดำเนินการ':'bg-amber-100 text-amber-700','กำลังดำเนินการ':'bg-blue-100 text-blue-700',
-   'ดำเนินการแล้ว':'bg-green-100 text-green-700','ส่งแล้ว':'bg-green-100 text-green-700',
-   'รอลงนาม':'bg-amber-100 text-amber-700'}[s]||'bg-slate-100 text-slate-600';
-  return `<span class="text-xs px-2 py-1 rounded-full ${c}">${s}</span>`;
+  content.innerHTML = H('ภาพรวมระบบ', CONFIG.ORG) + `<div class="bg-white rounded-xl shadow-sm p-6">ยินดีต้อนรับเข้าสู่ระบบสารบรรณอิเล็กทรอนิกส์ เลือกเมนูด้านซ้ายเพื่อเริ่มต้นใช้งาน</div>`;
 }
 
-/* ============ ทะเบียนหนังสือรับ/ส่ง ============ */
 let DOCS=[], SHEET='DocsIn';
 async function pgDocs(sheet){
-  SHEET=sheet; const isIn = sheet==='DocsIn';
-  DOCS=(await api('list',{sheet})).data;
-  content.innerHTML = H(isIn?'ทะเบียนหนังสือรับ':'ทะเบียนหนังสือส่ง','จัดเก็บและติดตามสถานะหนังสือราชการ') + `
+  SHEET = sheet; const isIn = sheet==='DocsIn';
+  DOCS = (await api('list', {sheet})).data;
+  content.innerHTML = H(isIn?'ทะเบียนหนังสือรับ':'ทะเบียนหนังสือส่ง','ระบบจัดการหนังสือราชการอิเล็กทรอนิกส์') + `
   <div class="flex gap-2 mb-4">
-    <input id="q" oninput="drawDocs()" placeholder="ค้นหา เลขที่ / เรื่อง / หน่วยงาน..." class="flex-1 border rounded-lg px-4 py-2">
-    ${can('doc.create')?`<button onclick="formDoc()" class="bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold">+ ลงทะเบียน</button>`:''}
+    <input id="q" oninput="drawDocs()" placeholder="ค้นหา..." class="flex-1 border rounded-lg px-4 py-2">
   </div>
   <div class="bg-white rounded-xl shadow-sm overflow-auto"><table class="w-full text-sm">
-    <thead class="bg-slate-50 text-left text-slate-600"><tr>
-      <th class="p-3">เลขทะเบียน</th><th>เลขที่หนังสือ</th><th>ลงวันที่</th>
-      <th>${isIn?'จาก':'ถึง'}</th><th>เรื่อง</th><th>ชั้นความเร็ว</th><th>สถานะ</th><th></th>
-    </tr></thead><tbody id="tb"></tbody></table></div>`;
+    <thead class="bg-slate-50 text-left"><tr><th class="p-3">เลขทะเบียน</th><th>เลขที่</th><th>ลงวันที่</th><th>${isIn?'จาก':'ถึง'}</th><th>เรื่อง</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+    <tbody id="tb"></tbody></table></div>`;
   drawDocs();
 }
+
 function drawDocs(){
-  const isIn = SHEET==='DocsIn', kw=(document.getElementById('q').value||'').toLowerCase();
-  const rows = DOCS.filter(d=>JSON.stringify(d).toLowerCase().includes(kw));
-  document.getElementById('tb').innerHTML = rows.length? rows.map(d=>`<tr class="border-t hover:bg-slate-50">
+  const kw = (document.getElementById('q').value||'').toLowerCase();
+  const rows = DOCS.filter(d => JSON.stringify(d).toLowerCase().includes(kw));
+  document.getElementById('tb').innerHTML = rows.length ? rows.map(d => `<tr class="border-t">
     <td class="p-3 font-semibold">${d.RegNo}</td><td>${d.DocNo}</td><td>${d.DocDate}</td>
-    <td>${isIn?d.Sender:d.Receiver}</td><td class="max-w-xs">${d.Subject}</td>
-    <td>${d.Urgency==='ปกติ'?'<span class="text-slate-400">ปกติ</span>:'<span class="text-red-600 font-semibold">'+d.Urgency+'</span>'}</td>
-    <td>${badge(d.Status)}</td>
-    <td class="p-3 text-right whitespace-nowrap">
-      <button onclick='viewDoc("${d.DocID}")' class="text-blue-600 text-xs mr-2">ดู</button>
-      ${can('doc.edit')?`<button onclick='formDoc("${d.DocID}")' class="text-amber-600 text-xs mr-2">แก้ไข</button>`:''}
-      ${can('doc.delete')?`<button onclick='delDoc("${d.DocID}")' class="text-red-600 text-xs">ลบ</button>`:''}
-    </td></tr>`).join('') : `<tr><td colspan="8" class="p-6 text-center text-slate-400">ไม่พบข้อมูล</td></tr>`;
+    <td>${SHEET==='DocsIn'?d.Sender:d.Receiver}</td><td>${d.Subject}</td><td>${d.Status}</td>
+    <td class="p-3 whitespace-nowrap">
+      <button onclick='printOfficial("${d.DocID}")' class="text-purple-600 text-xs mr-2 font-semibold">พิมพ์ PDF</button>
+      ${SHEET==='DocsIn' && can('doc.approve') ? `<button onclick='openWorkflowModal("${d.DocID}")' class="text-sky-600 text-xs mr-2 font-semibold">เกษียน</button>` : ''}
+    </td></tr>`).join('') : `<tr><td colspan="7" class="p-6 text-center text-slate-400">ไม่พบข้อมูล</td></tr>`;
 }
-function viewDoc(id){
-  const d = DOCS.find(x=>x.DocID===id), isIn=SHEET==='DocsIn';
-  openModal('รายละเอียดหนังสือ', `<dl class="grid grid-cols-3 gap-y-3 text-sm">
-    ${[['เลขทะเบียน',d.RegNo],['เลขที่หนังสือ',d.DocNo],['ลงวันที่',d.DocDate],
-       [isIn?'วันที่รับ':'วันที่ส่ง',isIn?d.ReceiveDate:d.SendDate],[isIn?'จากหน่วยงาน':'ถึง',isIn?d.Sender:d.Receiver],
-       ['ประเภท',d.DocType],['ชั้นความเร็ว',d.Urgency],['ชั้นความลับ',d.Secrecy],
-       ['เรื่อง',d.Subject],['ผู้รับผิดชอบ',d.AssignTo||'-'],['สถานะ',d.Status],['หมายเหตุ',d.Note||'-'],
-       ['ไฟล์แนบ', d.FileURL?`<a class="text-blue-600 underline" target="_blank" href="${d.FileURL}">เปิดไฟล์</a>`:'ไม่มี']]
-      .map(r=>`<dt class="text-slate-500">${r[0]}</dt><dd class="col-span-2">${r[1]}</dd>`).join('')}
-  </dl>`);
+
+async function printOfficial(id){
+  const r = await api('printDoc', { sheet: SHEET, docId: id });
+  if(r.ok) window.open(r.data.pdfUrl, '_blank'); else alert(r.error);
 }
-async function formDoc(id){
-  const isIn = SHEET==='DocsIn';
-  const d = id? DOCS.find(x=>x.DocID===id) : {DocID:'',RegNo:(await api('nextRegNo',{sheet:SHEET})).data.regNo,
-    DocNo:'',DocDate:'',ReceiveDate:'',SendDate:'',Sender:'',Receiver:'',Subject:'',DocType:'หนังสือภายใน',
-    Urgency:'ปกติ',Secrecy:'ปกติ',FileURL:'',AssignTo:'',Status:isIn?'รอดำเนินการ':'รอลงนาม',Note:''};
-  const F=(l,k,t='text')=>`<div><label class="text-sm text-slate-600">${l}</label>
-    <input id="f_${k}" type="${t}" value="${d[k]||''}" class="w-full border rounded-lg px-3 py-2 mt-1"></div>`;
-  const S=(l,k,o)=>`<div><label class="text-sm text-slate-600">${l}</label>
-    <select id="f_${k}" class="w-full border rounded-lg px-3 py-2 mt-1">${o.map(x=>`<option ${d[k]===x?'selected':''}>${x}</option>`).join('')}</select></div>`;
-  openModal(id?'แก้ไขหนังสือ':'ลงทะเบียนหนังสือใหม่', `
-    <div class="grid grid-cols-2 gap-4">
-      ${F('เลขทะเบียน','RegNo')}${F('เลขที่หนังสือ','DocNo')}
-      ${F('ลงวันที่','DocDate')}${isIn?F('วันที่รับ','ReceiveDate'):F('วันที่ส่ง','SendDate')}
-      ${isIn?F('จากหน่วยงาน','Sender'):F('ถึงหน่วยงาน/บุคคล','Receiver')}
-      ${S('ประเภทหนังสือ','DocType',['หนังสือภายใน','หนังสือภายนอก','คำสั่ง','ประกาศ','บันทึกข้อความ','หนังสือเวียน'])}
-      ${S('ชั้นความเร็ว','Urgency',['ปกติ','ด่วน','ด่วนมาก','ด่วนที่สุด'])}
-      ${S('ชั้นความลับ','Secrecy',['ปกติ','ลับ','ลับมาก','ลับที่สุด'])}
-      <div class="col-span-2">${F('เรื่อง','Subject')}</div>
-      ${isIn?F('ผู้รับผิดชอบ/มอบหมายให้','AssignTo'):''}
-      ${S('สถานะ','Status',isIn?['รอดำเนินการ','กำลังดำเนินการ','ดำเนินการแล้ว','ยกเลิก']:['รอลงนาม','ส่งแล้ว','ยกเลิก'])}
-      <div class="col-span-2">${F('ลิงก์ไฟล์แนบ (Google Drive)','FileURL')}</div>
-      <div class="col-span-2">${F('หมายเหตุ','Note')}</div>
-    </div>
-    <div class="mt-5 flex justify-end gap-2">
-      <button onclick="closeModal()" class="px-4 py-2 rounded-lg border">ยกเลิก</button>
-      <button onclick="saveDoc('${id||''}')" class="px-5 py-2 rounded-lg bg-purple-700 text-white font-semibold">บันทึก</button>
+
+async function openWorkflowModal(docId){
+  const d = DOCS.find(x => x.DocID === docId);
+  const history = (await api('workflowHistory', {docId})).data;
+  openModal('เกษียนหนังสือ / สั่งการ (E-Approval)', `
+    <div class="space-y-4 text-sm">
+      <div class="bg-slate-50 p-3 rounded-lg border"><b>${d.Subject}</b><div class="text-xs text-slate-500">เลขรับ: ${d.RegNo}</div></div>
+      <div><h4 class="font-semibold mb-2">ประวัติการเกษียน (${history.length})</h4>
+      <div class="space-y-2 max-h-32 overflow-auto border p-2 rounded">${history.map(h=>`<div><b>${h.FromUser}</b> ➔ ${h.ToUser} [${h.Action}]: ${h.Comment}</div>`).join('')||'ยังไม่มี'}</div></div>
+      <div class="border-t pt-3 space-y-2">
+        <select id="wfAction" class="w-full border rounded p-2"><option>ทราบ / ดำเนินการ</option><option>เห็นชอบ / อนุมัติ</option></select>
+        <textarea id="wfComment" rows="2" class="w-full border rounded p-2" placeholder="ความเห็นสั่งการ..."></textarea>
+      </div>
+      <div class="flex justify-between"><button onclick="downloadSlip('${docId}')" class="text-xs text-blue-600 underline">📥 ดาวน์โหลดใบปะหน้า</button>
+      <button onclick="submitWorkflow('${docId}')" class="px-4 py-2 bg-sky-600 text-white rounded">บันทึก</button></div>
     </div>`);
 }
-async function saveDoc(id){
-  const isIn = SHEET==='DocsIn';
-  const keys = ['RegNo','DocNo','DocDate',isIn?'ReceiveDate':'SendDate',isIn?'Sender':'Receiver',
-                'DocType','Urgency','Secrecy','Subject','Status','FileURL','Note'].concat(isIn?['AssignTo']:[]);
-  const rec = {DocID:id||''}; keys.forEach(k=>{const el=document.getElementById('f_'+k); if(el) rec[k]=el.value;});
-  rec.CreatedBy = ME.username; rec.CreatedAt = new Date().toISOString().slice(0,10);
-  if(!rec.Subject){ alert('กรุณากรอกเรื่อง'); return; }
-  await api('save',{sheet:SHEET,record:rec}); closeModal(); pgDocs(SHEET);
-}
-async function delDoc(id){ if(!confirm('ยืนยันการลบหนังสือฉบับนี้?'))return;
-  await api('delete',{sheet:SHEET,id}); pgDocs(SHEET); }
 
-/* ============ ค้นหาข้ามทะเบียน ============ */
-async function pgSearch(){
-  content.innerHTML = H('ค้นหาหนังสือราชการ','ค้นหาจากทะเบียนหนังสือรับและหนังสือส่งพร้อมกัน') + `
-  <div class="flex gap-2 mb-4">
-    <input id="sq" placeholder="คำค้น เช่น เลขที่หนังสือ / เรื่อง / หน่วยงาน / ปี" class="flex-1 border rounded-lg px-4 py-2">
-    <button onclick="runSearch()" class="bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold">ค้นหา</button>
-  </div><div id="sr"></div>`;
+async function submitWorkflow(docId){
+  const r = await api('saveWorkflow', { docId, action: wfAction.value, comment: wfComment.value, user: ME.username, userFullName: ME.fullName });
+  if(r.ok){ alert('บันทึกสำเร็จ'); closeModal(); pgDocs('DocsIn'); } else alert(r.error);
 }
-async function runSearch(){
-  const kw = sq.value.toLowerCase().trim(); if(!kw) return;
-  const a=(await api('list',{sheet:'DocsIn'})).data.map(d=>({...d,_t:'หนังสือรับ',_p:d.Sender}));
-  const b=(await api('list',{sheet:'DocsOut'})).data.map(d=>({...d,_t:'หนังสือส่ง',_p:d.Receiver}));
-  const r=[...a,...b].filter(d=>JSON.stringify(d).toLowerCase().includes(kw));
-  sr.innerHTML = `<p class="text-sm text-slate-500 mb-2">พบ ${r.length} รายการ</p>` +
-   (r.map(d=>`<div class="bg-white rounded-xl p-4 shadow-sm mb-2 border-l-4 ${d._t==='หนังสือรับ'?'border-blue-500':'border-green-500'}">
-      <div class="flex justify-between"><span class="text-xs px-2 py-0.5 rounded bg-slate-100">${d._t}</span>${badge(d.Status)}</div>
-      <div class="font-semibold mt-1">${d.Subject}</div>
-      <div class="text-sm text-slate-500">เลขทะเบียน ${d.RegNo} · ${d.DocNo} · ลงวันที่ ${d.DocDate} · ${d._p}</div>
-   </div>`).join('') || '<p class="text-slate-400">ไม่พบข้อมูลที่ตรงกับคำค้น</p>');
+async function downloadSlip(docId){
+  const r = await api('approvalSlip', {docId});
+  if(r.ok) window.open(r.data.pdfUrl, '_blank');
 }
 
-/* ============ โมดูล Admin : จัดการผู้ใช้ ============ */
-let USERS=[],ROLES=[];
-async function pgUsers(){
-  USERS=(await api('list',{sheet:'Users'})).data; ROLES=(await api('list',{sheet:'Roles'})).data;
-  content.innerHTML = H('จัดการผู้ใช้งาน','เพิ่ม ลบ แก้ไขบัญชีผู้ใช้ และกำหนดบทบาท (แก้ไขรหัสผ่านใน Google Sheet ได้โดยตรง)') + `
-  <button onclick="formUser()" class="bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold mb-4">+ เพิ่มผู้ใช้</button>
-  <div class="bg-white rounded-xl shadow-sm overflow-auto"><table class="w-full text-sm">
-   <thead class="bg-slate-50 text-left text-slate-600"><tr><th class="p-3">รหัส</th><th>ชื่อผู้ใช้</th><th>ชื่อ-สกุล</th><th>ตำแหน่ง</th><th>บทบาท</th><th>สถานะ</th><th></th></tr></thead>
-   <tbody>${USERS.map(u=>`<tr class="border-t">
-     <td class="p-3">${u.UserID}</td><td class="font-semibold">${u.Username}</td><td>${u.FullName}</td><td>${u.Position}</td>
-     <td><span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">${(ROLES.find(r=>r.Role===u.Role)||{}).RoleName||u.Role}</span></td>
-     <td>${u.Status==='ACTIVE'?'<span class="text-green-600">ใช้งาน</span>':'<span class="text-red-600">ระงับ</span>'}</td>
-     <td class="p-3 text-right"><button onclick='formUser("${u.UserID}")' class="text-amber-600 text-xs mr-2">แก้ไข</button>
-     <button onclick='delUser("${u.UserID}")' class="text-red-600 text-xs">ลบ</button></td></tr>`).join('')}</tbody></table></div>`;
+function pgReport(){
+  content.innerHTML = H('รายงานประจำเดือน (Docs Template)', 'สร้างรายงานตามรูปแบบระเบียบสารบรรณ') + `
+  <div class="bg-white rounded-xl shadow-sm p-6 max-w-xl space-y-4">
+    <div><label class="text-sm">ปี พ.ศ.</label><input id="rY" value="2568" class="w-full border rounded p-2 mt-1"></div>
+    <button onclick="makeReport()" class="bg-purple-700 text-white px-5 py-2.5 rounded font-semibold">สร้างรายงาน PDF</button>
+    <div id="rOut"></div>
+  </div>`;
 }
-function formUser(id){
-  const u = id? USERS.find(x=>x.UserID===id) : {UserID:'',Username:'',Password:'',FullName:'',Position:'',Role:'STAFF',Status:'ACTIVE',Email:''};
-  const F=(l,k)=>`<div><label class="text-sm text-slate-600">${l}</label><input id="g_${k}" value="${u[k]||''}" class="w-full border rounded-lg px-3 py-2 mt-1"></div>`;
-  openModal(id?'แก้ไขผู้ใช้':'เพิ่มผู้ใช้ใหม่',`<div class="grid grid-cols-2 gap-4">
-    ${F('ชื่อผู้ใช้','Username')}${F('รหัสผ่าน','Password')}${F('ชื่อ-สกุล','FullName')}${F('ตำแหน่ง','Position')}${F('อีเมล','Email')}
-    <div><label class="text-sm text-slate-600">บทบาท/สิทธิ์</label><select id="g_Role" class="w-full border rounded-lg px-3 py-2 mt-1">
-      ${ROLES.map(r=>`<option value="${r.Role}" ${u.Role===r.Role?'selected':''}>${r.RoleName}</option>`).join('')}</select></div>
-    <div><label class="text-sm text-slate-600">สถานะ</label><select id="g_Status" class="w-full border rounded-lg px-3 py-2 mt-1">
-      <option ${u.Status==='ACTIVE'?'selected':''}>ACTIVE</option><option ${u.Status!=='ACTIVE'?'selected':''}>INACTIVE</option></select></div>
-   </div><div class="mt-5 flex justify-end gap-2"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg">ยกเลิก</button>
-   <button onclick="saveUser('${id||''}')" class="px-5 py-2 bg-purple-700 text-white rounded-lg font-semibold">บันทึก</button></div>`);
-}
-async function saveUser(id){
-  const rec={UserID:id||''}; ['Username','Password','FullName','Position','Email','Role','Status']
-    .forEach(k=>rec[k]=document.getElementById('g_'+k).value);
-  await api('save',{sheet:'Users',record:rec}); closeModal(); pgUsers();
-}
-async function delUser(id){ if(id===ME.userId){alert('ไม่สามารถลบบัญชีตนเองได้');return;}
-  if(!confirm('ยืนยันการลบผู้ใช้?'))return; await api('delete',{sheet:'Users',id}); pgUsers(); }
-
-/* ============ โมดูลกำหนดสิทธิ์ ============ */
-async function pgRoles(){
-  ROLES=(await api('list',{sheet:'Roles'})).data;
-  content.innerHTML = H('กำหนดสิทธิ์การใช้งาน','ติ๊กเลือกสิทธิ์ของแต่ละบทบาท แล้วกดบันทึก') + `
-   <div class="bg-white rounded-xl shadow-sm overflow-auto p-1"><table class="w-full text-sm">
-    <thead class="bg-slate-50"><tr><th class="p-3 text-left">บทบาท</th>
-      ${Object.values(PERM_LIST).map(n=>`<th class="p-2 text-xs font-medium">${n}</th>`).join('')}<th></th></tr></thead>
-    <tbody>${ROLES.map((r,i)=>`<tr class="border-t">
-      <td class="p-3 font-semibold">${r.RoleName}<div class="text-xs text-slate-400">${r.Role}</div></td>
-      ${Object.keys(PERM_LIST).map(k=>`<td class="text-center"><input type="checkbox" class="w-4 h-4"
-        data-r="${i}" data-k="${k}" ${String(r.Permissions).includes(k)?'checked':''}></td>`).join('')}
-      <td class="p-3"><button onclick="saveRole(${i})" class="bg-purple-700 text-white text-xs px-3 py-1.5 rounded">บันทึก</button></td>
-    </tr>`).join('')}</tbody></table></div>
-    <p class="text-xs text-slate-500 mt-3">* การเปลี่ยนสิทธิ์จะมีผลเมื่อผู้ใช้เข้าสู่ระบบครั้งถัดไป</p>`;
-}
-async function saveRole(i){
-  const perms=[...document.querySelectorAll(`input[data-r="${i}"]:checked`)].map(c=>c.dataset.k);
-  const rec={...ROLES[i],Permissions:perms.join(',')};
-  await api('save',{sheet:'Roles',record:rec}); alert('บันทึกสิทธิ์เรียบร้อย'); pgRoles();
+async function makeReport(){
+  rOut.innerHTML = 'กำลังสร้างเอกสาร...';
+  const r = await api('reportDocs', { year: rY.value });
+  rOut.innerHTML = r.ok ? `<a href="${r.data.pdfUrl}" target="_blank" class="text-blue-600 underline">📄 เปิดไฟล์รายงาน PDF</a>` : r.error;
 }
 
-/* ============ ประวัติการใช้งาน ============ */
-async function pgLogs(){
-  const lg=(await api('list',{sheet:'Logs'})).data;
-  content.innerHTML = H('ประวัติการใช้งานระบบ','บันทึกการเข้าใช้และการแก้ไขข้อมูล') + `
-  <div class="bg-white rounded-xl shadow-sm overflow-auto"><table class="w-full text-sm">
-   <thead class="bg-slate-50 text-left"><tr><th class="p-3">เวลา</th><th>ผู้ใช้</th><th>การกระทำ</th><th>รายละเอียด</th></tr></thead>
-   <tbody>${lg.length?lg.map(l=>`<tr class="border-t"><td class="p-3">${l.Timestamp}</td><td>${l.Username}</td>
-     <td><span class="text-xs bg-slate-100 px-2 py-1 rounded">${l.Action}</span></td><td>${l.Detail}</td></tr>`).join('')
-     :'<tr><td colspan="4" class="p-6 text-center text-slate-400">ยังไม่มีประวัติ</td></tr>'}</tbody></table></div>`;
-}
-
-/* ============ Modal ============ */
+function pgSearch(){ content.innerHTML = H('ค้นหาหนังสือ'); }
+function pgUsers(){ content.innerHTML = H('จัดการผู้ใช้งาน'); }
 function openModal(t,b){ mTitle.textContent=t; mBody.innerHTML=b; modal.classList.remove('hidden'); }
 function closeModal(){ modal.classList.add('hidden'); }
 
-/* ============ คืนค่า session ============ */
 if(sessionStorage.EDOC_ME){ ME=JSON.parse(sessionStorage.EDOC_ME); startApp(); }
-document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!app.classList.contains('hidden')===false) doLogin(); });
 </script>
 </body>
 </html>
