@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ระบบบันทึกข้อความอิเล็กทรอนิกส์ | ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- ไลบรารีแปลง HTML เป็น Word (.docx) -->
 <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>body{font-family:'Sarabun',sans-serif}</style>
@@ -21,13 +20,13 @@
       <p class="text-xs text-slate-500 mt-1">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา<br>คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
     </div>
     <div class="space-y-3">
-      <div><label class="text-xs text-slate-600 font-semibold">ชื่อผู้ใช้</label><input id="u" placeholder="เช่น admin หรือ officer" class="w-full border rounded-lg px-4 py-2 mt-1 outline-none focus:ring-2 ring-purple-400 text-sm"></div>
+      <div><label class="text-xs text-slate-600 font-semibold">ชื่อผู้ใช้</label><input id="u" placeholder="admin หรือ officer" class="w-full border rounded-lg px-4 py-2 mt-1 outline-none focus:ring-2 ring-purple-400 text-sm"></div>
       <div><label class="text-xs text-slate-600 font-semibold">รหัสผ่าน</label><input id="p" type="password" placeholder="รหัสผ่าน" class="w-full border rounded-lg px-4 py-2 mt-1 outline-none focus:ring-2 ring-purple-400 text-sm"></div>
       <p id="loginErr" class="text-red-600 text-xs hidden"></p>
       <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold text-sm mt-2">เข้าสู่ระบบ</button>
     </div>
     <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border">
-      <b>บัญชีทดลองตั้งต้น:</b><br>• แอดมิน: <code>admin</code> / <code>admin123</code><br>• เจ้าหน้าที่: <code>officer</code> / <code>1234</code><br><i>(รหัสผ่านแก้ไขที่ชีต Users ใน Google Sheet ได้ทันที)</i>
+      <b>บัญชีทดลอง:</b> <code>admin</code> / <code>admin123</code> หรือ <code>officer</code> / <code>1234</code>
     </div>
   </div>
 </div>
@@ -51,7 +50,7 @@
   <main id="content" class="flex-1 p-8 overflow-auto"></main>
 </div>
 
-<!-- Modal ฟอร์มสร้าง/แก้ไขบันทึกข้อความ -->
+<!-- Modal ฟอร์มสร้าง/แก้ไข -->
 <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-xl w-full max-w-4xl max-h-[92vh] overflow-auto p-6 shadow-2xl">
     <div class="flex justify-between items-center pb-3 border-b mb-4">
@@ -125,7 +124,7 @@ async function loadMemos(){
                 <button onclick="openForm('${m.MemoID}')" class="text-amber-600 hover:underline text-xs font-semibold">แก้ไข</button>
                 <button onclick="delMemo('${m.MemoID}')" class="text-red-600 hover:underline text-xs font-semibold">ลบ</button>
               </td>
-            </tr>`).join('') : `<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการสร้างบันทึกข้อความในระบบ</td></tr>`}
+            </tr>`).join('') : `<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการสร้างบันทึกข้อความ</td></tr>`}
         </tbody>
       </table>
     </div>`;
@@ -139,12 +138,14 @@ function openForm(id){
     FromDept: 'ภาควิชาเทคโนโลยีและสื่อสารการศึกษา โทร. ๐ ๔๓๗๕ ๔๓๒๑',
     ToDept: 'คณบดีคณะศึกษาศาสตร์',
     Subject: '',
-    Content: '',
+    Content1: '',
+    Content2: '',
+    Content3: '',
     SenderName: ME.fullName,
     SenderPos: ME.position
   };
   
-  mTitle.textContent = id ? 'แก้ไขบันทึกข้อความ' : 'สร้างบันทึกข้อความราชการใหม่';
+  mTitle.textContent = id ? 'แก้ไขบันทึกข้อความ' : 'สร้างบันทึกข้อความตามแบบมาตรฐาน';
   mBody.innerHTML = `
     <div class="grid grid-cols-2 gap-4 text-sm">
       <div><label class="font-semibold text-slate-600">ที่หนังสือ</label><input id="f_DocNo" value="${m.DocNo}" class="w-full border rounded px-3 py-2 mt-1"></div>
@@ -154,9 +155,19 @@ function openForm(id){
       <div class="col-span-2"><label class="font-semibold text-slate-600">เรียน (ถึง)</label><input id="f_ToDept" value="${m.ToDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
       <div class="col-span-2"><label class="font-semibold text-slate-600">เรื่อง</label><input id="f_Subject" value="${m.Subject}" class="w-full border rounded px-3 py-2 mt-1"></div>
       
-      <div class="col-span-2">
-        <label class="font-semibold text-slate-600">เนื้อหาบันทึกข้อความ (ระบบจะจัดย่อหน้า 2.5 ซม. อัตโนมัติ)</label>
-        <textarea id="f_Content" rows="6" class="w-full border rounded px-3 py-2 mt-1 leading-relaxed" placeholder="พิมพ์รายละเอียดเนื้อหาที่นี่...">${m.Content}</textarea>
+      <div class="col-span-2 bg-slate-50 p-3 rounded border">
+        <label class="font-bold text-purple-900 block mb-1">1. ภาคเหตุ (ความเป็นมา / ข้อเท็จจริง)</label>
+        <textarea id="f_Content1" rows="3" class="w-full border rounded px-3 py-2 bg-white" placeholder="ด้วยภาควิชา...">${m.Content1}</textarea>
+      </div>
+
+      <div class="col-span-2 bg-slate-50 p-3 rounded border">
+        <label class="font-bold text-purple-900 block mb-1">2. ภาคความประสงค์ (จุดประสงค์ที่เสนอมา)</label>
+        <textarea id="f_Content2" rows="3" class="w-full border rounded px-3 py-2 bg-white" placeholder="ในการนี้ ภาควิชาจึง...">${m.Content2}</textarea>
+      </div>
+
+      <div class="col-span-2 bg-slate-50 p-3 rounded border">
+        <label class="font-bold text-purple-900 block mb-1">3. ภาคสรุป (ข้อเสนอเพื่อพิจารณา)</label>
+        <textarea id="f_Content3" rows="2" class="w-full border rounded px-3 py-2 bg-white" placeholder="จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ">${m.Content3}</textarea>
       </div>
 
       <div><label class="font-semibold text-slate-600">ชื่อผู้ลงนาม</label><input id="f_SenderName" value="${m.SenderName}" class="w-full border rounded px-3 py-2 mt-1"></div>
@@ -178,7 +189,9 @@ async function saveMemo(id){
     FromDept: document.getElementById('f_FromDept').value,
     ToDept: document.getElementById('f_ToDept').value,
     Subject: document.getElementById('f_Subject').value,
-    Content: document.getElementById('f_Content').value,
+    Content1: document.getElementById('f_Content1').value,
+    Content2: document.getElementById('f_Content2').value,
+    Content3: document.getElementById('f_Content3').value,
     SenderName: document.getElementById('f_SenderName').value,
     SenderPos: document.getElementById('f_SenderPos').value,
     CreatedBy: ME.username
@@ -188,18 +201,14 @@ async function saveMemo(id){
 }
 
 async function delMemo(id){
-  if(!confirm('ยืนยันการลบบันทึกข้อความฉบับนี้?')) return;
+  if(!confirm('ยืนยันการลบฉบับนี้?')) return;
   await api('delete', { sheet: 'Memos', id });
   loadMemos();
 }
 
-// ฟังก์ชันแปลงเอกสารพร้อมตราครุฑและจัดรูปแบบตามระเบียบงานสารบรรณ ส่งออกเป็นไฟล์ .docx
 function exportWord(id){
   const m = MEMOS.find(x => x.MemoID === id);
   if(!m) return;
-
-  // URL ตราครุฑมาตรฐาน (PNG พื้นหลังโปร่งใส สำหรับใช้ในเอกสารราชการ)
-  const garudaUrl = "https://upload.wikimedia.org/wikipedia/commons/f/fa/Emblem_of_Thailand.svg";
 
   const htmlContent = `
     <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -211,26 +220,21 @@ function exportWord(id){
       .memo-title { text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px; }
       .header-table { width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px; }
       .header-table td { padding: 3px 0; vertical-align: top; }
-      .divider { border: none; border-top: 1.5px solid #000; margin: 2px 0 10px 0; }
+      .divider { border: none; border-top: 1.5px solid #000; margin: 2px 0 15px 0; }
       .to-section { font-size: 16pt; margin-bottom: 15px; }
-      .content { text-indent: 2.5cm; text-align: justify; margin-bottom: 20px; line-height: 1.2; }
-      .signature { text-align: center; margin-top: 30px; margin-left: 50%; line-height: 1.2; font-size: 16pt; }
+      .content { text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2; }
+      .signature { text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; font-size: 16pt; }
     </style>
     </head>
     <body>
-      <!-- ตราครุฑ -->
       <div class="garuda-container">
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" class="garuda-img" alt="ตราครุฑ" />
       </div>
 
-      <!-- หัวข้อบันทึกข้อความ -->
       <div class="memo-title">บันทึกข้อความ</div>
       
-      <!-- ตารางส่วนราชการ ที่ วันที่ เรื่อง -->
       <table class="header-table">
-        <tr>
-          <td style="width: 100%;"><b>ส่วนราชการ:</b> ${m.FromDept}</td>
-        </tr>
+        <tr><td><b>ส่วนราชการ:</b> ${m.FromDept}</td></tr>
         <tr>
           <td>
             <table style="width: 100%; border-collapse: collapse;">
@@ -241,22 +245,17 @@ function exportWord(id){
             </table>
           </td>
         </tr>
-        <tr>
-          <td><b>เรื่อง:</b> ${m.Subject}</td>
-        </tr>
+        <tr><td><b>เรื่อง:</b> ${m.Subject}</td></tr>
       </table>
       
       <hr class="divider" />
       
-      <!-- เรียน -->
       <div class="to-section"><b>เรียน:</b> ${m.ToDept}</div>
       
-      <!-- เนื้อหา -->
-      <div class="content">
-        ${m.Content.replace(/\n/g, '<br/><span style="display:inline-block; width:2.5cm;"></span>')}
-      </div>
+      <div class="content">${m.Content1}</div>
+      <div class="content">${m.Content2}</div>
+      <div class="content">${m.Content3}</div>
       
-      <!-- ลงชื่อ -->
       <div class="signature">
         <p>( ${m.SenderName} )</p>
         <p>${m.SenderPos}</p>
