@@ -25,6 +25,9 @@
       <p id="loginErr" class="text-red-600 text-xs hidden"></p>
       <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold text-sm mt-2">เข้าสู่ระบบ</button>
     </div>
+    <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border">
+      <b>บัญชีทดลอง:</b> <code>admin</code> / <code>admin123</code> หรือ <code>officer</code> / <code>1234</code>
+    </div>
   </div>
 </div>
 
@@ -230,20 +233,18 @@ async function delMemo(id){
   loadMemos();
 }
 
-// สร้างโครงสร้าง HTML ตามแบบหนังสือภายใน หรือ หนังสือภายนอก
 function generateDocumentHTML(m){
   const isExternal = m.DocType === 'หนังสือภายนอก';
 
   if(isExternal){
-    // รูปแบบหนังสือภายนอก ตามระเบียบสารบรรณ
     return `
-      <div style="text-align: center; margin-bottom: 10px;">
+      <div style="text-align: left; margin-bottom: 10px;">
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 3cm; height: auto;" alt="ตราครุฑ" />
       </div>
       <table style="width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 20px;">
         <tr>
           <td style="width: 50%;"><b>ที่:</b> ${m.DocNo}</td>
-          <td style="width: 50%; text-align: right;"><b>${m.FromDept.split(' ')[0]}</b></td>
+          <td style="width: 50%; text-align: right;"><b>${m.FromDept}</b></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align: right; padding-top: 5px;">${m.DocDate}</td>
@@ -255,17 +256,16 @@ function generateDocumentHTML(m){
       <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content1}</div>
       <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content2}</div>
       <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 20px; line-height: 1.2;">${m.Content3}</div>
-      <div style="text-align: center; margin-bottom: 30px;">ขอแสดงความนับถือ</div>
-      <div style="text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; font-size: 16pt;">
+      <div style="text-align: center; margin-bottom: 30px; margin-left: 40%;">ขอแสดงความนับถือ</div>
+      <div style="text-align: center; margin-top: 40px; margin-left: 40%; line-height: 1.2; font-size: 16pt;">
         <p>( ${m.SenderName} )</p>
         <p>${m.SenderPos}</p>
       </div>
     `;
   } else {
-    // รูปแบบหนังสือภายใน (บันทึกข้อความ)
     return `
       <div style="text-align: center; margin-bottom: 5px;">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 2.5cm; height: auto;" alt="ตราครุฑ" />
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 1.5cm; height: auto;" alt="ตราครุฑ" />
       </div>
       <div style="text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px;">บันทึกข้อความ</div>
       <table style="width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px;">
