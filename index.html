@@ -61,6 +61,25 @@
   </div>
 </div>
 
+<!-- Modal สำหรับพรีวิว PDF -->
+<div id="previewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-200 rounded-xl w-full max-w-4xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+    <div class="flex justify-between items-center px-6 py-3 bg-purple-900 text-white">
+      <h3 class="font-bold text-base">📄 พรีวิวรูปแบบหนังสือราชการ (จำลอง PDF)</h3>
+      <button onclick="closePreview()" class="text-2xl font-bold">&times;</button>
+    </div>
+    <div id="previewContainer" class="flex-1 p-6 overflow-auto flex justify-center">
+      <!-- กระดาษ A4 จำลอง -->
+      <div id="a4Paper" class="bg-white shadow-lg p-12 text-slate-900" style="width: 210mm; min-height: 297mm; box-sizing: border-box; font-size: 16pt; font-family: 'Sarabun', sans-serif; line-height: 1.0;">
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 px-6 py-3 bg-white border-t">
+      <button onclick="closePreview()" class="px-4 py-2 border rounded text-sm">ปิดหน้าต่าง</button>
+      <button id="btnPrint" class="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded font-semibold text-sm">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbzFsEgjvUxmw9Ekn4YP_sbXFzwp4rAY03KYoYzxtLx_Tdb5R2zNwQruORaOZ-NzjFEM/exec'
@@ -120,7 +139,8 @@ async function loadMemos(){
               <td class="p-3 font-medium text-purple-900">${m.Subject}</td>
               <td class="p-3">${m.ToDept}</td>
               <td class="p-3 text-right space-x-2">
-                <button onclick="exportWord('${m.MemoID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">📥 โหลด Word</button>
+                <button onclick="previewPDF('${m.MemoID}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-semibold">👀 พรีวิว PDF</button>
+                <button onclick="exportWord('${m.MemoID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">📥 Word</button>
                 <button onclick="openForm('${m.MemoID}')" class="text-amber-600 hover:underline text-xs font-semibold">แก้ไข</button>
                 <button onclick="delMemo('${m.MemoID}')" class="text-red-600 hover:underline text-xs font-semibold">ลบ</button>
               </td>
@@ -204,6 +224,58 @@ async function delMemo(id){
   if(!confirm('ยืนยันการลบฉบับนี้?')) return;
   await api('delete', { sheet: 'Memos', id });
   loadMemos();
+}
+
+// ฟังก์ชันพรีวิวรูปแบบหนังสือราชการเสมือน PDF
+function previewPDF(id){
+  const m = MEMOS.find(x => x.MemoID === id);
+  if(!m) return;
+
+  const paper = document.getElementById('a4Paper');
+  paper.innerHTML = `
+    <div style="text-align: center; margin-bottom: 5px;">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 2.5cm; height: auto;" alt="ตราครุฑ" />
+    </div>
+    <div style="text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px;">บันทึกข้อความ</div>
+    
+    <table style="width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px;">
+      <tr><td><b>ส่วนราชการ:</b> ${m.FromDept}</td></tr>
+      <tr>
+        <td>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 60%;"><b>ที่:</b> ${m.DocNo}</td>
+              <td style="width: 40%;"><b>วันที่:</b> ${m.DocDate}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr><td><b>เรื่อง:</b> ${m.Subject}</td></tr>
+    </table>
+    
+    <hr style="border: none; border-top: 1.5px solid #000; margin: 2px 0 15px 0;" />
+    
+    <div style="font-size: 16pt; margin-bottom: 15px;"><b>เรียน:</b> ${m.ToDept}</div>
+    
+    <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content1}</div>
+    <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content2}</div>
+    <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content3}</div>
+    
+    <div style="text-align: center; margin-top: 50px; margin-left: 50%; line-height: 1.2; font-size: 16pt;">
+      <p>( ${m.SenderName} )</p>
+      <p>${m.SenderPos}</p>
+    </div>
+  `;
+
+  document.getElementById('btnPrint').onclick = () => {
+    window.print();
+  };
+
+  document.getElementById('previewModal').classList.remove('hidden');
+}
+
+function closePreview(){
+  document.getElementById('previewModal').classList.add('hidden');
 }
 
 function exportWord(id){
