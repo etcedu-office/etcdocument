@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ระบบบันทึกข้อความอิเล็กทรอนิกส์ | ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</title>
+<title>ระบบสารบรรณอิเล็กทรอนิกส์ | ภาควิชาเทคโนโลยีและสื่อสารการศึกษา มมส</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
 <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
   <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border">
     <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-purple-700 rounded-full mx-auto flex items-center justify-center text-white text-3xl">📝</div>
-      <h1 class="text-xl font-bold mt-3">ระบบบันทึกข้อความ (E-Memo)</h1>
+      <div class="w-16 h-16 bg-purple-700 rounded-full mx-auto flex items-center justify-center text-white text-3xl">🏛️</div>
+      <h1 class="text-xl font-bold mt-3">ระบบสารบรรณอิเล็กทรอนิกส์</h1>
       <p class="text-xs text-slate-500 mt-1">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา<br>คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
     </div>
     <div class="space-y-3">
@@ -25,9 +25,6 @@
       <p id="loginErr" class="text-red-600 text-xs hidden"></p>
       <button onclick="doLogin()" class="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-lg font-semibold text-sm mt-2">เข้าสู่ระบบ</button>
     </div>
-    <div class="mt-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border">
-      <b>บัญชีทดลอง:</b> <code>admin</code> / <code>admin123</code> หรือ <code>officer</code> / <code>1234</code>
-    </div>
   </div>
 </div>
 
@@ -35,11 +32,11 @@
 <div id="app" class="hidden min-h-screen flex">
   <aside class="w-64 bg-purple-900 text-purple-100 flex flex-col">
     <div class="p-5 border-b border-purple-800">
-      <div class="font-bold text-white">E-Memo EdTech MSU</div>
-      <div class="text-xs text-purple-300">ระบบสารบรรณบันทึกข้อความ</div>
+      <div class="font-bold text-white">E-Document EdTech</div>
+      <div class="text-xs text-purple-300">ระบบสารบรรณอิเล็กทรอนิกส์</div>
     </div>
     <nav class="flex-1 p-3 space-y-1 text-sm">
-      <a href="#" class="block px-3 py-2 rounded-lg bg-purple-800 font-semibold text-white">📋 ทะเบียนบันทึกข้อความ</a>
+      <a href="#" class="block px-3 py-2 rounded-lg bg-purple-800 font-semibold text-white">📁 ทะเบียนหนังสือราชการ</a>
     </nav>
     <div class="p-4 border-t border-purple-800 text-sm">
       <div id="meName" class="font-semibold text-white"></div>
@@ -65,13 +62,11 @@
 <div id="previewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
   <div class="bg-slate-200 rounded-xl w-full max-w-4xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
     <div class="flex justify-between items-center px-6 py-3 bg-purple-900 text-white">
-      <h3 class="font-bold text-base">📄 พรีวิวรูปแบบหนังสือราชการ (จำลอง PDF)</h3>
+      <h3 class="font-bold text-base">📄 พรีวิวรูปแบบหนังสือราชการมาตรฐาน</h3>
       <button onclick="closePreview()" class="text-2xl font-bold">&times;</button>
     </div>
     <div id="previewContainer" class="flex-1 p-6 overflow-auto flex justify-center">
-      <!-- กระดาษ A4 จำลอง -->
-      <div id="a4Paper" class="bg-white shadow-lg p-12 text-slate-900" style="width: 210mm; min-height: 297mm; box-sizing: border-box; font-size: 16pt; font-family: 'Sarabun', sans-serif; line-height: 1.0;">
-      </div>
+      <div id="a4Paper" class="bg-white shadow-lg p-12 text-slate-900" style="width: 210mm; min-height: 297mm; box-sizing: border-box; font-size: 16pt; font-family: 'Sarabun', sans-serif; line-height: 1.0;"></div>
     </div>
     <div class="flex justify-end gap-3 px-6 py-3 bg-white border-t">
       <button onclick="closePreview()" class="px-4 py-2 border rounded text-sm">ปิดหน้าต่าง</button>
@@ -114,37 +109,37 @@ async function loadMemos(){
   content.innerHTML = `
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-slate-800">ทะเบียนบันทึกข้อความราชการ</h2>
-        <p class="text-sm text-slate-500">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม</p>
+        <h2 class="text-2xl font-bold text-slate-800">ทะเบียนหนังสือราชการ (ภายใน / ภายนอก)</h2>
+        <p class="text-sm text-slate-500">ภาควิชาเทคโนโลยีและสื่อสารการศึกษา คณะศึกษาศาสตร์ มมส</p>
       </div>
-      <button onclick="openForm()" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-lg font-semibold text-sm shadow">+ สร้างบันทึกข้อความใหม่</button>
+      <button onclick="openForm()" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2.5 rounded-lg font-semibold text-sm shadow">+ สร้างหนังสือราชการใหม่</button>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
       <table class="w-full text-sm text-left">
         <thead class="bg-slate-50 border-b text-slate-600">
           <tr>
+            <th class="p-3">ประเภทหนังสือ</th>
             <th class="p-3">ที่หนังสือ</th>
             <th class="p-3">วันที่</th>
             <th class="p-3">เรื่อง</th>
-            <th class="p-3">ผู้รับ (ถึง)</th>
             <th class="p-3 text-right">จัดการ / ส่งออก</th>
           </tr>
         </thead>
         <tbody>
           ${MEMOS.length ? MEMOS.map(m => `
             <tr class="border-b hover:bg-slate-50">
+              <td class="p-3"><span class="px-2 py-1 rounded text-xs font-semibold ${m.DocType === 'หนังสือภายนอก' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}">${m.DocType || 'หนังสือภายใน'}</span></td>
               <td class="p-3 font-semibold">${m.DocNo}</td>
               <td class="p-3">${m.DocDate}</td>
               <td class="p-3 font-medium text-purple-900">${m.Subject}</td>
-              <td class="p-3">${m.ToDept}</td>
-              <td class="p-3 text-right space-x-2">
-                <button onclick="previewPDF('${m.MemoID}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-semibold">👀 พรีวิว PDF</button>
-                <button onclick="exportWord('${m.MemoID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">📥 Word</button>
+              <td class="p-3 text-right space-x-1">
+                <button onclick="previewPDF('${m.MemoID}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-semibold">👀 พรีวิว</button>
+                <button onclick="exportWord('${m.MemoID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs font-semibold">📥 Word</button>
                 <button onclick="openForm('${m.MemoID}')" class="text-amber-600 hover:underline text-xs font-semibold">แก้ไข</button>
                 <button onclick="delMemo('${m.MemoID}')" class="text-red-600 hover:underline text-xs font-semibold">ลบ</button>
               </td>
-            </tr>`).join('') : `<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการสร้างบันทึกข้อความ</td></tr>`}
+            </tr>`).join('') : `<tr><td colspan="5" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลหนังสือในระบบ</td></tr>`}
         </tbody>
       </table>
     </div>`;
@@ -153,9 +148,10 @@ async function loadMemos(){
 function openForm(id){
   const m = id ? MEMOS.find(x => x.MemoID === id) : {
     MemoID: '',
+    DocType: 'หนังสือภายใน',
     DocNo: 'อว 0605.6/',
     DocDate: new Date().toISOString().slice(0,10),
-    FromDept: 'ภาควิชาเทคโนโลยีและสื่อสารการศึกษา โทร. ๐ ๔๓๗๕ ๔๓๒๑',
+    FromDept: 'ภาควิชาเทคโนโลยีและสื่อสารการศึกษา คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม',
     ToDept: 'คณบดีคณะศึกษาศาสตร์',
     Subject: '',
     Content1: '',
@@ -165,24 +161,31 @@ function openForm(id){
     SenderPos: ME.position
   };
   
-  mTitle.textContent = id ? 'แก้ไขบันทึกข้อความ' : 'สร้างบันทึกข้อความตามแบบมาตรฐาน';
+  mTitle.textContent = id ? 'แก้ไขหนังสือราชการ' : 'สร้างหนังสือราชการใหม่ตามระเบียบสารบรรณ';
   mBody.innerHTML = `
     <div class="grid grid-cols-2 gap-4 text-sm">
+      <div class="col-span-2">
+        <label class="font-semibold text-slate-600">ประเภทหนังสือราชการ</label>
+        <select id="f_DocType" class="w-full border rounded px-3 py-2 mt-1 bg-purple-50 font-semibold text-purple-900">
+          <option ${m.DocType==='หนังสือภายใน'?'selected':''}>หนังสือภายใน (ใช้ภายในกระทรวง ทบวง กรม หรือจังหวัดเดียวกัน)</option>
+          <option ${m.DocType==='หนังสือภายนอก'?'selected':''}>หนังสือภายนอก (ใช้ติดต่อกับหน่วยงานภายนอก / บุคคลภายนอก)</option>
+        </select>
+      </div>
       <div><label class="font-semibold text-slate-600">ที่หนังสือ</label><input id="f_DocNo" value="${m.DocNo}" class="w-full border rounded px-3 py-2 mt-1"></div>
       <div><label class="font-semibold text-slate-600">วันที่</label><input id="f_DocDate" type="date" value="${m.DocDate}" class="w-full border rounded px-3 py-2 mt-1"></div>
       
-      <div class="col-span-2"><label class="font-semibold text-slate-600">ส่วนราชการ (จาก)</label><input id="f_FromDept" value="${m.FromDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
-      <div class="col-span-2"><label class="font-semibold text-slate-600">เรียน (ถึง)</label><input id="f_ToDept" value="${m.ToDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      <div class="col-span-2"><label class="font-semibold text-slate-600">ส่วนราชการ / หน่วยงานที่ออกหนังสือ (จาก)</label><input id="f_FromDept" value="${m.FromDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
+      <div class="col-span-2"><label class="font-semibold text-slate-600">เรียน (ผู้รับหนังสือ)</label><input id="f_ToDept" value="${m.ToDept}" class="w-full border rounded px-3 py-2 mt-1"></div>
       <div class="col-span-2"><label class="font-semibold text-slate-600">เรื่อง</label><input id="f_Subject" value="${m.Subject}" class="w-full border rounded px-3 py-2 mt-1"></div>
       
       <div class="col-span-2 bg-slate-50 p-3 rounded border">
         <label class="font-bold text-purple-900 block mb-1">1. ภาคเหตุ (ความเป็นมา / ข้อเท็จจริง)</label>
-        <textarea id="f_Content1" rows="3" class="w-full border rounded px-3 py-2 bg-white" placeholder="ด้วยภาควิชา...">${m.Content1}</textarea>
+        <textarea id="f_Content1" rows="2" class="w-full border rounded px-3 py-2 bg-white" placeholder="ระบุความเป็นมา...">${m.Content1}</textarea>
       </div>
 
       <div class="col-span-2 bg-slate-50 p-3 rounded border">
-        <label class="font-bold text-purple-900 block mb-1">2. ภาคความประสงค์ (จุดประสงค์ที่เสนอมา)</label>
-        <textarea id="f_Content2" rows="3" class="w-full border rounded px-3 py-2 bg-white" placeholder="ในการนี้ ภาควิชาจึง...">${m.Content2}</textarea>
+        <label class="font-bold text-purple-900 block mb-1">2. ภาคความประสงค์ (วัตถุประสงค์ / กิจที่ต้องการให้ดำเนินการ)</label>
+        <textarea id="f_Content2" rows="2" class="w-full border rounded px-3 py-2 bg-white" placeholder="ระบุวัตถุประสงค์...">${m.Content2}</textarea>
       </div>
 
       <div class="col-span-2 bg-slate-50 p-3 rounded border">
@@ -196,7 +199,7 @@ function openForm(id){
 
     <div class="mt-6 flex justify-end gap-2 pt-3 border-t">
       <button onclick="closeModal()" class="px-4 py-2 border rounded text-sm">ยกเลิก</button>
-      <button onclick="saveMemo('${id||''}')" class="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded font-semibold text-sm">บันทึกข้อมูลลง Sheet</button>
+      <button onclick="saveMemo('${id||''}')" class="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded font-semibold text-sm">บันทึกข้อมูล</button>
     </div>`;
   modal.classList.remove('hidden');
 }
@@ -204,6 +207,7 @@ function openForm(id){
 async function saveMemo(id){
   const rec = {
     MemoID: id,
+    DocType: document.getElementById('f_DocType').value.includes('ภายนอก') ? 'หนังสือภายนอก' : 'หนังสือภายใน',
     DocNo: document.getElementById('f_DocNo').value,
     DocDate: document.getElementById('f_DocDate').value,
     FromDept: document.getElementById('f_FromDept').value,
@@ -221,56 +225,81 @@ async function saveMemo(id){
 }
 
 async function delMemo(id){
-  if(!confirm('ยืนยันการลบฉบับนี้?')) return;
+  if(!confirm('ยืนยันการลบหนังสือฉบับนี้?')) return;
   await api('delete', { sheet: 'Memos', id });
   loadMemos();
 }
 
-// ฟังก์ชันพรีวิวรูปแบบหนังสือราชการเสมือน PDF
+// สร้างโครงสร้าง HTML ตามแบบหนังสือภายใน หรือ หนังสือภายนอก
+function generateDocumentHTML(m){
+  const isExternal = m.DocType === 'หนังสือภายนอก';
+
+  if(isExternal){
+    // รูปแบบหนังสือภายนอก ตามระเบียบสารบรรณ
+    return `
+      <div style="text-align: center; margin-bottom: 10px;">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 3cm; height: auto;" alt="ตราครุฑ" />
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 20px;">
+        <tr>
+          <td style="width: 50%;"><b>ที่:</b> ${m.DocNo}</td>
+          <td style="width: 50%; text-align: right;"><b>${m.FromDept.split(' ')[0]}</b></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align: right; padding-top: 5px;">${m.DocDate}</td>
+        </tr>
+      </table>
+      <div style="font-size: 16pt; margin-bottom: 15px;"><b>เรื่อง:</b> ${m.Subject}</div>
+      <div style="font-size: 16pt; margin-bottom: 15px;"><b>สิ่งที่ส่งมาด้วย:</b> ไม่มี</div>
+      <div style="font-size: 16pt; margin-bottom: 15px;"><b>เรียน:</b> ${m.ToDept}</div>
+      <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content1}</div>
+      <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content2}</div>
+      <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 20px; line-height: 1.2;">${m.Content3}</div>
+      <div style="text-align: center; margin-bottom: 30px;">ขอแสดงความนับถือ</div>
+      <div style="text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; font-size: 16pt;">
+        <p>( ${m.SenderName} )</p>
+        <p>${m.SenderPos}</p>
+      </div>
+    `;
+  } else {
+    // รูปแบบหนังสือภายใน (บันทึกข้อความ)
+    return `
+      <div style="text-align: center; margin-bottom: 5px;">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 2.5cm; height: auto;" alt="ตราครุฑ" />
+      </div>
+      <div style="text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px;">บันทึกข้อความ</div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px;">
+        <tr><td><b>ส่วนราชการ:</b> ${m.FromDept}</td></tr>
+        <tr>
+          <td>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="width: 60%;"><b>ที่:</b> ${m.DocNo}</td>
+                <td style="width: 40%;"><b>วันที่:</b> ${m.DocDate}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td><b>เรื่อง:</b> ${m.Subject}</td></tr>
+      </table>
+      <hr style="border: none; border-top: 1.5px solid #000; margin: 2px 0 15px 0;" />
+      <div style="font-size: 16pt; margin-bottom: 15px;"><b>เรียน:</b> ${m.ToDept}</div>
+      <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content1}</div>
+      <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content2}</div>
+      <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content3}</div>
+      <div style="text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; font-size: 16pt;">
+        <p>( ${m.SenderName} )</p>
+        <p>${m.SenderPos}</p>
+      </div>
+    `;
+  }
+}
+
 function previewPDF(id){
   const m = MEMOS.find(x => x.MemoID === id);
   if(!m) return;
-
-  const paper = document.getElementById('a4Paper');
-  paper.innerHTML = `
-    <div style="text-align: center; margin-bottom: 5px;">
-      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" style="width: 2.5cm; height: auto;" alt="ตราครุฑ" />
-    </div>
-    <div style="text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px;">บันทึกข้อความ</div>
-    
-    <table style="width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px;">
-      <tr><td><b>ส่วนราชการ:</b> ${m.FromDept}</td></tr>
-      <tr>
-        <td>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="width: 60%;"><b>ที่:</b> ${m.DocNo}</td>
-              <td style="width: 40%;"><b>วันที่:</b> ${m.DocDate}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr><td><b>เรื่อง:</b> ${m.Subject}</td></tr>
-    </table>
-    
-    <hr style="border: none; border-top: 1.5px solid #000; margin: 2px 0 15px 0;" />
-    
-    <div style="font-size: 16pt; margin-bottom: 15px;"><b>เรียน:</b> ${m.ToDept}</div>
-    
-    <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content1}</div>
-    <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content2}</div>
-    <div style="text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2;">${m.Content3}</div>
-    
-    <div style="text-align: center; margin-top: 50px; margin-left: 50%; line-height: 1.2; font-size: 16pt;">
-      <p>( ${m.SenderName} )</p>
-      <p>${m.SenderPos}</p>
-    </div>
-  `;
-
-  document.getElementById('btnPrint').onclick = () => {
-    window.print();
-  };
-
+  document.getElementById('a4Paper').innerHTML = generateDocumentHTML(m);
+  document.getElementById('btnPrint').onclick = () => window.print();
   document.getElementById('previewModal').classList.remove('hidden');
 }
 
@@ -287,58 +316,17 @@ function exportWord(id){
     <head><meta charset='utf-8'><title>${m.Subject}</title>
     <style>
       body { font-family: 'TH Sarabun PSK', 'Sarabun', sans-serif; font-size: 16pt; line-height: 1.0; margin-top: 2.5cm; margin-bottom: 2.5cm; margin-left: 3cm; margin-right: 2.5cm; }
-      .garuda-container { text-align: center; margin-bottom: 5px; }
-      .garuda-img { width: 2.5cm; height: auto; }
-      .memo-title { text-align: center; font-size: 29pt; font-weight: bold; line-height: 1.1; margin-bottom: 15px; }
-      .header-table { width: 100%; border-collapse: collapse; font-size: 16pt; margin-bottom: 5px; }
-      .header-table td { padding: 3px 0; vertical-align: top; }
-      .divider { border: none; border-top: 1.5px solid #000; margin: 2px 0 15px 0; }
-      .to-section { font-size: 16pt; margin-bottom: 15px; }
-      .content { text-indent: 2.5cm; text-align: justify; margin-bottom: 15px; line-height: 1.2; }
-      .signature { text-align: center; margin-top: 40px; margin-left: 50%; line-height: 1.2; font-size: 16pt; }
     </style>
     </head>
     <body>
-      <div class="garuda-container">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Thailand_%28Garuda%29.svg?width=300" class="garuda-img" alt="ตราครุฑ" />
-      </div>
-
-      <div class="memo-title">บันทึกข้อความ</div>
-      
-      <table class="header-table">
-        <tr><td><b>ส่วนราชการ:</b> ${m.FromDept}</td></tr>
-        <tr>
-          <td>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="width: 60%;"><b>ที่:</b> ${m.DocNo}</td>
-                <td style="width: 40%;"><b>วันที่:</b> ${m.DocDate}</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td><b>เรื่อง:</b> ${m.Subject}</td></tr>
-      </table>
-      
-      <hr class="divider" />
-      
-      <div class="to-section"><b>เรียน:</b> ${m.ToDept}</div>
-      
-      <div class="content">${m.Content1}</div>
-      <div class="content">${m.Content2}</div>
-      <div class="content">${m.Content3}</div>
-      
-      <div class="signature">
-        <p>( ${m.SenderName} )</p>
-        <p>${m.SenderPos}</p>
-      </div>
+      ${generateDocumentHTML(m)}
     </body>
     </html>`;
 
   const converted = htmlDocx.asBlob(htmlContent);
   const link = document.createElement('a');
   link.href = URL.createObjectURL(converted);
-  link.download = `บันทึกข้อความ_${m.DocNo.replace(/\//g, '-')}.docx`;
+  link.download = `${m.DocType}_${m.DocNo.replace(/\//g, '-')}.docx`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
